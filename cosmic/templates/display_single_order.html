@@ -1,0 +1,281 @@
+{% extends 'cosmic_base.html' %} 
+{% block content %}
+<div class="form-group pull-left">
+  <div style="margin-left: 200px">
+    <strong>
+      {% if my_order.order_no%}
+      <h2>Order Detail</h2>
+      {%else%}
+      <!-- <h2>Purchase Detail</h2> -->
+      {% endif %}
+    </strong>
+  </div>
+  <!-- <form action="/GRN/print_pr">
+    <div class="form-group col-sm-4" style="display: flex; margin-top: 20px; ">
+      <input type="text" name="PR_no" placeholder="PR No" class="form-control" style=" margin-top: 10px; ">
+      <div style="width: 20%;"><button type="submit" class="btn btn-primary">Search Order</button></div>
+    </div>
+  </form> -->
+
+  <br />
+  <br />
+
+  <section class="intro">
+    <div class="gradient-custom h-100">
+      <div class="mask d-flex align-items-center h-100">
+        <div class="container">
+          <div class="row justify-content-center">
+            <div class="col-12">
+              <div id="datatable">
+                <table class="table table-striped table-bordered" style="margin-left: 30px">
+                  {% if my_order.order_no%}
+                  <tr>
+                    <th>Order Number</th>
+                    <th>Date</th>
+                    <th>Total Price</th>
+                    <th>Vendor Name</th>
+                    <th>Status</th>
+                  </tr>
+
+                  <tr>
+                    <td>
+                      <a href="#" class="order-link" data-order-id="{{ my_order.order_no }}">{{ my_order.order_no}}</a>
+                    </td>
+                    <td>{{ my_order.date }}</td>
+                    <td>{{ my_order.PR_before_vat }}</td>
+                    <td>{{ my_order.customer_name.customer_name }}</td>
+                    <td>{{ my_order.status }}</td>
+                  </tr>
+                  {%else%}
+                  <!-- <tr>
+                    <th>Purchase Number</th>
+                    <th>Date</th>
+                    <th>Total Price</th>
+                    <th>Vendor Name</th>
+                    <th>Status</th>
+                  </tr> -->
+<!-- 
+                  <tr>
+                    <td>
+                      <a href="#" class="order-link" data-order-id="{{ my_order.purchase_no }}">{{my_order.purchase_no}}</a>
+                    </td>
+                    <td>{{ my_order.date }}</td>
+                    <td>{{ my_order.before_vat }}</td>
+                    <td>{{ my_order.supplier_name.supplier_name }}</td>
+                    <td>{{ my_order.status }}</td>
+                  </tr> -->
+
+                  {% endif%}
+                </table>
+              </div>
+              <table class="table table-striped table-bordered" style="margin-left: 30px">
+                {% if my_order.order_no%}
+                <tr>
+                  <th>Select</th>
+                  <th>Invoice Number</th>
+                  <th>Order Number</th>
+                  <th>Invoice Date</th>
+                  <th></th>
+                </tr>
+
+                {% for invoice in the_invoices %}
+                <tr>
+                  <td>
+                    <input type="radio" name="selected_invoice" class="invoice-radio"
+                      data-invoice-id="{{ invoice.invoice_num }}" />
+                  </td>
+                  <td>
+                    <a href="#" class="invoice-link"
+                      data-invoice-id="{{ invoice.invoice_num}}">{{invoice.invoice_num}}</a>
+                  </td>
+                  <td>
+                    <a href="#" class="order-link" data-order-id="{{ invoice.order_no.order_no }}">{{ invoice.order_no.order_no }}</a>
+                  </td>
+                  <td>{{ invoice.invoice_date }}</td>
+                  <td><button type="submit" class="btn btn-primary"
+                    onclick="redirectToEditShipping('{{ invoice.invoice_num }}')">
+                    <i class="fas fa-edit"></i>
+                  </button></td>
+                </tr>
+                {% endfor %} {%else%}
+                <!-- <tr>
+                  <th>Purchase Number</th>
+                  <th>Date</th>
+                  <th>Total Price</th>
+                  <th>Vendor Name</th>
+                  <th>Status</th>
+                </tr>
+
+                <tr>
+                  <td>
+                    <a href="#" class="order-link" data-order-id="{{ my_order.purchase_no }}">{{my_order.purchase_no}}</a>
+                  </td>
+                  <td>{{ my_order.date }}</td>
+                  <td>{{ my_order.before_vat }}</td>
+                  <td>{{ my_order.supplier_name.supplier_name }}</td>
+                  <td>{{ my_order.status }}</td> -->
+
+                <!-- </tr> -->
+
+                {% endif%}
+              </table>
+              
+              <div class="col-md-3">
+                <div style="width: 20%">
+                  <button type="submit" class="btn btn-primary"
+                    onclick="redirectToPrintOrder('{{ my_order.order_no }}')">
+                    Proforma Invoice
+                  </button>
+                </div>
+
+                <div style="width: 20%">
+                  <button type="submit" class="btn btn-primary"
+                    onclick="redirectToPage('{{ my_order.order_no }}','commercial_invoice')">
+                    Commercial Invoice
+                  </button>
+                </div>
+
+                <div style="width: 20%">
+                  <button type="submit" class="btn btn-primary"
+                    onclick="redirectToPage('{{ my_order.order_no }}','bill_of_lading')">
+                    Bill of Lading
+                  </button>
+                </div>
+              </div>
+              <div class="col-sm-5">
+                <div style="width: 20%">
+                  <button type="submit" class="btn btn-primary"
+                    onclick="redirectToPage('{{ my_order.order_no }}','truck_waybill')">
+                    Truck Waybill
+                  </button>
+                </div>
+                <div style="width: 20%">
+                  <button type="submit" class="btn btn-primary"
+                    onclick="redirectToPage('{{ my_order.order_no }}','packing_list')">
+                    Packing List
+                  </button>
+                </div>
+
+                <div style="width: 20%">
+                  <button type="submit" class="btn btn-primary"
+                    onclick="redirectToShippingDetails('{{ my_order.order_no }}')">
+                    Add Shipping Details
+                  </button>
+                </div>
+                <div style="width: 20%">
+                  <button type="submit" class="btn btn-primary"
+                    onclick="redirectToEditOrder('{{ my_order.order_no }}')">
+                    Edit Order
+                  </button>
+                </div>
+              </div>
+              
+              
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+  const orderID = document.getElementById("data-order-id");
+
+  function redirectToPage(orderID, page) {
+    let invoiceID = "";
+    const selectedInvoice = document.querySelector(
+      'input[name="selected_invoice"]:checked'
+    );
+    console.log("try", selectedInvoice);
+    if (selectedInvoice) {
+      const invoiceID = selectedInvoice.getAttribute("data-invoice-id");
+      //window.location.href = `/cosmic/print_order?order_no=${orderID}&invoice_num=${invoiceID}`;
+      console.log(invoiceID, "inv");
+      let url = "";
+
+      if (page === "bill_of_lading") {
+        url = `/cosmic/bill_of_lading?order_no=${orderID}&invoice_num=${invoiceID}`;
+      } // Add more conditions for other pages
+      else if (page === "commercial_invoice") {
+        url = `/cosmic/commercial_invoice?order_no=${orderID}&invoice_num=${invoiceID}`;
+      } else if (page === "packing_list") {
+        url = `/cosmic/packing_list?order_no=${orderID}&invoice_num=${invoiceID}`;
+      } else if (page === "truck_waybill") {
+        url = `/cosmic/truck_waybill?order_no=${orderID}&invoice_num=${invoiceID}`;
+      } else if (page === "shipping_order") {
+        url = `/cosmic/edit?order_no=${orderID}`;
+      }
+      if (url !== "") {
+        window.location.href = url;
+      }
+    } else {
+      alert("Please select an invoice to proceed.");
+    }
+  }
+  function redirectToCommercialInvoice(orderID) {
+    window.location.href = `/cosmic/print_order?order_no=${orderID}&invoice_num=${selectedInvoice}`;
+  }
+
+  function redirectToBillOfLading(orderID) {
+    window.location.href = `/cosmic/print_order?order_no=${orderID}&invoice_num=${selectedInvoice}`;
+  }
+  function redirectToTruckWaybill(orderID) {
+    window.location.href = `/cosmic/print_order?order_no=${orderID}&invoice_num=${selectedInvoice}`;
+  }
+
+  function redirectToPrintOrder(orderID) {
+    window.location.href = `/cosmic/print_order?order_no=${orderID}`;
+
+    //window.location.href = `/cosmic/print_order?order_no=${orderID}&invoice_num=${invoiceID}`;
+  }
+  function redirectToEditOrder(orderID) {
+    window.location.href = `/cosmic/update_order?order_no=${orderID}`;
+
+    //window.location.href = `/cosmic/print_order?order_no=${orderID}&invoice_num=${invoiceID}`;
+  }
+  // function redirectToEditPurchase(purchaseID) {
+  //   window.location.href = `/cosmic/update_purchase?purchase_no=${purchaseID}`;
+
+    //window.location.href = `/cosmic/print_order?order_no=${orderID}&invoice_num=${invoiceID}`;
+  // }
+  function redirectToEditShipping(orderID) {
+    window.location.href = `/cosmic/update_shipping?invoice_num=${orderID}`;
+
+    //window.location.href = `/cosmic/print_order?order_no=${orderID}&invoice_num=${invoiceID}`;
+  }
+
+  function redirectToShippingDetails(orderID) {
+    window.location.href = `/cosmic/edit_order?order_no=${orderID}`;
+
+    //window.location.href = `/cosmic/print_order?order_no=${orderID}&invoice_num=${invoiceID}`;
+  }
+
+  function redirectToPackingList(orderID) {
+    window.location.href = `/cosmic/print_order?order_no=${orderID}&invoice_num=${selectedInvoice}`;
+  }
+  document.addEventListener("DOMContentLoaded", function () {
+    const orderLinks = document.querySelectorAll(".order-link");
+    console.log("p1");
+    orderLinks.forEach(function (link) {
+      link.addEventListener("click", function (event) {
+        event.preventDefault();
+        console.log("p2");
+        const orderID = this.getAttribute("data-order-id");
+        window.location.href = `/cosmic/print_order?order_no=${orderID}`;
+      });
+    });
+    const orderLinks2 = document.querySelectorAll(".order-link2");
+    console.log("p1");
+    orderLinks2.forEach(function (link) {
+      link.addEventListener("click", function (event) {
+        event.preventDefault();
+        console.log("p2");
+        const orderID = this.getAttribute("data-order-id");
+        window.location.href = `/GRN/print_order?PR_no=${orderID}`;
+      });
+    });
+  });
+</script>
+{% endblock %}

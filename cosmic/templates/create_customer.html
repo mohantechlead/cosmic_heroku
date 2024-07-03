@@ -1,0 +1,100 @@
+{% extends "cosmic_base.html" %}
+
+{% block content %}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+<div>
+    <span class="col-md-3" ></span>
+    <h1>Create Customer</h1>
+</div>
+
+<br>
+<form method="post" action="{% url 'create_customer' %}" id="form1">
+    {% csrf_token %}
+   
+    <div class="container d-flex justify-content-center align-items-center" style="padding: 2%;margin: auto;">
+        <div class="card" >
+            <div class="card-body form-floating" >
+            <div class="col-sm-6" >
+                <div  >
+                    <label class="control-label col-sm-8" style="margin-top: 10px;">Customer name</label>
+                    <div class="col-sm-8">
+        
+                        <input type="text" class="form-control" name="customer_name" >
+                    </div>
+                </div>
+            
+                <span class="form-group">
+                    <label class="control-label col-sm-5 ">Phone Number</label>
+                    <div class="col-sm-8">
+        
+                        <input type="text" class="form-control" name="phone_number">
+                    </div>
+                </span>
+                <span class="form-group">
+                    <label class="control-label col-sm-5">Customer Address</label>
+                    <div class="col-sm-8" style="margin-top: 10px;">
+                        <input type="text" class="form-control" name="customer_address">
+        
+                    </div>
+                </span>
+        
+        
+            </div>
+        
+            <div class="col-sm-5" >
+                <span class="form-group" >
+                    <label class="control-label col-sm-10">Email Address</label>
+                    <div class="col-sm-10" style="margin-top: 10px;">
+                        <input type="email" class="form-control" name="email">
+        
+                    </div>
+                </span>
+                <span class="form-group">
+                    <label class="control-label col-sm-10">Contact Person</label>
+                    <div class="col-sm-10" >
+                        <input type="text" class="form-control" name="contact_person">
+        
+                    </div>
+                </span>
+            </div>
+            
+            
+        
+            <div class="col-sm-6">
+               
+        
+                <div class="form-group" style="margin-bottom: 10px;">
+                    <label class="control-label col-sm-8" >Comments</label>
+                    <div class="col-sm-8" style=" height: 100px;">
+                        <input type="text" class="form-control" name="comments" style="height: 100px;">
+        
+                    </div>
+                    <div class="col-sm-8" style="height: 50px;">
+                        
+                    </div>
+                    <!-- <label class="control-label col-sm-4" style="margin-top: 10px;">Invoice Type</label>
+                  <div class="col-sm-8" style="margin-top: 10px;">
+                    <input type="text" class="form-control" name="invoice_type">
+                    
+                  </div> -->
+                </div>
+            </div>
+        </div>
+        <div>
+            
+              <div style="justify-content: center;" class="col-sm-7">
+                <span class="col-sm-7"></span>
+                <button type="submit"  class="col-sm-3 btn-lg " style="background-image:url('../static/back1.PNG');color: aliceblue; ">
+                  
+                  <strong>Create</strong>
+              </button>
+               </div>
+        </div>
+        </div>
+    </div>
+</form>
+</div></div></div>
+{% endblock %}

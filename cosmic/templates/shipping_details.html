@@ -1,0 +1,439 @@
+{% extends "cosmic_base.html" %}
+{% load widget_tweaks %}
+
+
+{% block content %}
+<!-- {% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+    <li{% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</li>
+        {% endfor %}
+</ul>
+{% endif %} -->
+
+<div class="container" style="margin: 30px;">
+    <div class="row">
+        <div class="col-md-12">
+
+            {% if ship_form.errors %}
+            <div class="alert alert-danger">
+                <strong>Error(s) occurred:</strong>
+                <ul>
+                    {% for field, errors in ship_form.errors.items %}
+                    {% for error in errors %}
+                    <li>{{ field }}: {{ error }}</li>
+                    {% endfor %}
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+            <form method="post" action="{% url 'create_shipping' %}" id="form2">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-sm-5">
+                        <span class="form-group">
+                            <label class="control-label col-sm-8"> Order Number <span style="color: rgb(187, 17, 17);">*</span></label>
+                            <div class="col-sm-11">
+    
+                                <input type="text" class="form-control" name="order_no" value="{{cosmic_order_instance.order_no}}" readonly>
+                            </div>
+                        </span> </div> </div>
+                <div>
+                    <div class="col-sm-6">
+                     
+    
+                        <span class="form-group">
+                            <label class="control-label col-sm-7">Invoice Number</label>
+                            <div class="col-sm-8">
+    
+                                <input type="text" class="form-control" name="invoice_num" >
+                            </div>
+                        </span>
+                        
+    
+    
+                    </div>
+                    <div class="col-sm-5">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Invoice Date <span style="color: rgb(187, 17, 17);">*</span></label>
+                            <div class="col-sm-8">
+                                <input type="date" name="invoice_date" value="{{form.instance.date}}" class="form-control datetimepicker-input"
+                                    data-target="#datepicker1" />
+                            </div>
+                        </div>
+                       
+                    </div>
+                    <div class="col-sm-8"></div>
+               
+                </div>
+<!-- Customer Details for linking customer model -->
+               
+
+               
+                <div class="col-sm-6">
+                    <span class="form-group">
+                        <label class="control-label col-sm-7">Waybill Number</label>
+                        <div class="col-sm-8">
+
+                            <input type="text" class="form-control" name="truck_waybill_no" >
+                        </div>
+                    </span>
+
+                    <div class="form-group">
+                        <label class="control-label col-sm-7">Customer Order Number<span style="color: rgb(187, 17, 17);">*</span></label>
+                        <div class="col-sm-8">
+                            <input type="text"  class="form-control" name="customer_no" value="{{form.instance.customer_name.customer_no}}">
+                            
+                        </div>
+
+                    </div>
+
+
+                </div>
+
+                <div>
+                    <div class="col-sm-5">
+                        <span class="form-group">
+                            <label class="control-label col-sm-7">Container Number</label>
+                            <div class="col-sm-8">
+    
+                                <input type="text" class="form-control" name="container_no" >
+                            </div>
+                        </span>
+                        <div class="form-group">
+                            <label class="control-label col-sm-7">Vessel</label>
+                            <div class="col-sm-8">
+                                <input type="text"  class="form-control" name="vessel" value="">
+                                
+                            </div>
+    
+                        </div>
+                       
+                    </div>
+                    <div class="col-sm-8"></div>
+               
+                </div>
+                <div class="col-sm-6">
+                    <span class="form-group">
+                        <label class="control-label col-sm-4">Invoice Remark</label>
+                        <div class="col-sm-10">
+                            <textarea type="text"  class="form-control" name="invoice_remark" style="height: 150px;"></textarea>
+                            
+                        </div>
+                        
+                    </span>
+                </div>
+                <div class="col-sm-5">
+                    <span class="form-group">
+                        <label class="control-label col-sm-4">WayBill Remark</label>
+                        <div class="col-sm-12">
+                            <textarea type="text"  class="form-control" name="waybill_remark" style="height: 150px;"></textarea>
+                            
+                        </div>
+                        
+                    </span>
+                </div>
+                <div class="col-sm-6">
+                    <span class="form-group">
+                        <label class="control-label col-sm-4">Packing List Remark</label>
+                        <div class="col-sm-10">
+                            <textarea type="text"  class="form-control" name="packing_remark" style="height: 150px;"></textarea>
+                            
+                        </div>
+                        
+                    </span>
+                </div>
+                <div class="col-sm-5">
+                    <span class="form-group">
+                        <label class="control-label col-sm-4">Bill of Lading Remark</label>
+                        <div class="col-sm-12">
+                            <textarea type="text"  class="form-control" name="lading_remark" style="height: 150px;"></textarea>
+                            
+                        </div>
+                        
+                    </span>
+                </div>
+            </form>
+
+            
+        </div>
+    </div>
+</div>
+<div class="container"><div class="row"><div class="col-md-7" style="font-size: small;">
+    <h3> Add Items</h3>
+     {% if pr_form.errors %}
+     <div class="alert alert-danger">
+         <strong>Error(s) occurred:</strong>
+         <ul>
+             {% for field, errors in pr_form.errors.items %}
+             {% for error in errors %}
+             <li>{{ field }}: {{ error }}</li>
+             {% endfor %}
+             {% endfor %}
+         </ul>
+     </div>
+     {% endif %}
+ 
+ 
+     <form method="post" action="{% url 'create_invoice_items' %}" id="form3">
+         {% csrf_token %}
+ 
+         {{ formset.management_form }}
+         {% for formset_error in formset.non_form_errors %}
+         <p>{{ formset_error }}</p>
+       {% endfor %}
+         <div id="form-lists" >
+             {% for form in formset %}
+             
+             <div class="card-body row item-list form-group col-md-4">
+ 
+                 {{form.as_p}}
+ 
+             </div>
+ 
+             {% endfor %}
+         </div>
+ 
+         <div id="empty-form" class="hidden"> {{ formset.empty_form.as_p}}</div>
+         <button id="add-more" class="btn btn-primary" type="button" style="background-image:url('../static/back1.PNG');color: aliceblue;">Add Item</button>
+ 
+        
+         
+ 
+     </form>
+ </div></div>
+ <div class="row">
+    <div class="col-sm-12">
+        <button id="submitss" class="col-sm-3 btn-lg"
+            style="background-image:url('../static/back1.PNG');color: aliceblue; padding: 8px 16px;font-weight: bolder;">
+            Calculate Total
+        </button>
+        <span class=" col-sm-4">
+            <p id="total-vat" name="total-vat"
+                style="height:50px; font-weight:bolder; font-size: 22px; color: black;"></p>
+        </span>
+
+    </div>
+</div>
+{% if messages %}
+{% for message in messages %}
+{% if message.tags == "error" %}
+<div class="alert alert-danger" role="alert">
+    {{message}}
+</div>
+{% else %}
+<div class="alert alert-success" role="alert">
+    {{message}}
+</div>
+{% endif %}
+{% endfor %}
+{% endif %}
+
+<div class="container">
+
+    <div class="row">
+        <div class="col-sm-12">
+            <span style="margin: 10px;" class="col-sm-3"></span>
+            <button id="submits" class="col-sm-2 btn-lg " 
+            style="background-image:url('../static/back1.PNG');color: aliceblue; margin-left: 100px;font-size: 24px; height: 62px; font-weight: bolder;">
+                Submit
+            </button>
+            <span style="margin: 10px;"></span>
+            <!-- <a href="" class="btn btn-default" style="font-size: large; margin-top: 5px;">Cancel</a> -->
+        </div>
+    </div>
+</div>
+
+
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        //const radioButtons = document.querySelectorAll('input[type="radio"]');
+        const radioButtons = document.querySelectorAll('.measurement_type');
+        const submitButton = document.querySelector('#submits');
+        const submitsButton = document.querySelector('#submitss');
+        const addMoreBtn = document.getElementById('add-more');
+        const priceFields = document.querySelectorAll('.price');
+        const totalPriceField = $('#total-price');
+        const totalVatField = $('#total-vat');
+        var orderNoValue = document.querySelector('input[name="order_no"]').value;
+        const radioButtons2 = document.querySelectorAll('.payment_type');
+        const totalNewForms = document.getElementById('id_items-TOTAL_FORMS')
+        console.log(totalNewForms)
+        console.log("try")
+        const quantityFields = $('.quantity');
+        //const discount_checkbox = document.getElementById("discountCheckbox");
+        
+        //var discount = false
+
+        submitsButton.addEventListener('click', function (event) {
+            event.preventDefault();
+            calculateTotalPrice();
+            console.log("calc")
+        });
+        addMoreBtn.addEventListener('click', add_new_form);
+        
+        var univ_total = 0
+        var univ_vat = 0
+        function calculateTotalPrice() {
+        var total = 0
+        var total_vat = 0
+        var originalTotal = 0;
+        var originalVat = 0;
+
+        const formsets = $('.item-list');
+        const total_price_fields = document.querySelectorAll('.total_price');
+        const total_vat_fields = document.querySelectorAll('.before_vat');
+        //const discountApplied = discount_checkbox.checked;
+        
+        $('.item-list').each(function() {
+            
+        
+            // Within each formset, select the 'total_price' fields
+            const totalFields = $(this).find('.total_price');
+            const vatFields = $(this).find('.before_vat');
+            totalFields.each(function() {
+            const price = parseFloat($(this).val()) || 0;
+         
+            total += price;
+            originalTotal += price; 
+            });
+            vatFields.each(function() {
+            const vat_price = parseFloat($(this).val()) || 0;
+            total_vat += vat_price;
+            originalVat += vat_price;
+          
+            });
+            
+            console.log(total)
+           
+            // Update the total for this formset
+            univ_total = total;
+            univ_vat = total_vat;
+            totalPriceField.val(total.toFixed(2));  // Update the 'value' of the field
+            totalPriceField.text('Total Price: $' + total.toFixed(2)); 
+            totalVatField.val(total_vat.toFixed(2));  // Update the 'value' of the field
+            totalVatField.text('Total Price: $' + total_vat.toFixed(2));  // Update the displayed text
+        });
+       
+            }
+
+    // Call the calculation function when the page loads
+    calculateTotalPrice();
+
+
+        radioButtons.forEach(button => {
+            button.addEventListener('change', function () {
+                // Hide all input elements
+                hideAllInputs();
+                console.log("trys")
+                // Show the input element corresponding to the selected radio button
+                const inputId = 'input_' + this.value;
+                const inputElement = document.getElementById(inputId);
+                if (inputElement) {
+                    inputElement.style.display = 'block';
+                }
+            });
+        });
+        
+        submitButton.addEventListener('click', function (event) {
+            event.preventDefault(); // Prevent the default form submission
+
+            // Serialize form data
+            const formData2 = new FormData(form2);
+            const formData3 = new FormData(form3);
+            //console.log(univ_total,"tots")
+            //const freightPrice = formData1.get('freight1');
+            const prNoValue = orderNoValue;
+            const inv_no = formData2.get('invoice_num')
+          
+            const amount = 1
+           
+            console.log(prNoValue)
+            console.log(inv_no)
+            formData2.append('order_no', prNoValue)
+            formData3.append('order_no', prNoValue)
+            formData3.append('invoice_num', inv_no)
+            // Use fetch to submit both forms asynchronously
+            fetch(form2.action, {
+            method: 'POST',
+            body: formData2
+        })
+   
+.then(response => {
+    if (response && !response.ok) {
+        return response.json().then(data => {
+            console.log('Form 2 errors:', data.form_errors);
+            // Display the errors in the UI for form 2
+        });
+    } else {
+        return fetch(form3.action, {
+            method: 'POST',
+            body: formData3
+        });
+    }
+})
+.then(response => {
+    if (response && !response.ok) {
+        return response.json().then(data => {
+            console.log('Form 3 errors:', data.form_errors);
+            // Display the errors in the UI for form 3
+        });
+    } else {
+        // Reset forms and reload the page after successfully submitting the third form
+        document.getElementById('form1').reset();
+        document.getElementById('form2').reset();
+        window.location.reload();
+        alert("Shipping Details Added!")
+    }
+})
+.catch(error => {
+    // console.error('Error submitting forms:', error);
+    // Handle any general errors during form submission
+});
+        });
+        function updateTotalPrice(form) {
+            var quantity = parseFloat(form.find('.quantity').val());
+            var price = parseFloat(form.find('.price').val());
+            var total = quantity * price || 0;
+            var total_price = total + (total * 0.15)
+            form.find('.before_vat').val(total.toFixed(2));
+            form.find('.total_price').val(total_price.toFixed(2));
+        }
+
+        $(document).on('input', '.item-list .quantity, .item-list .price', function () {
+            var form = $(this).closest('.item-list');
+            updateTotalPrice(form);
+        });
+
+        // Apply initial calculation for existing forms
+        $('.item-list').each(function () {
+            var form = $(this);
+            updateTotalPrice(form);
+        });
+        function add_new_form(args) {
+            // Your code to add a new form here
+            const currentForms = document.getElementsByClassName('item-list')
+            let currentFormsCount = currentForms.length + 1
+            console.log(currentForms.length)
+            console.log(totalNewForms);
+            const copyFormTarget = document.getElementById('form-lists')
+            const copyEmptyForm = document.getElementById('empty-form').cloneNode(true);
+            copyEmptyForm.setAttribute('class', 'item-list form-group col-md-5 text-dark')
+            copyEmptyForm.setAttribute('id', `form-${currentFormsCount}`)
+            // Clear input values in the cloned form
+            const regex = new RegExp('__prefix__', 'g')
+            copyEmptyForm.querySelectorAll('input').forEach(function (input) {
+                input.value = '';
+            });
+            copyEmptyForm.innerHTML = copyEmptyForm.innerHTML.replace(regex, currentFormsCount)
+            // Append the cloned form to the form list
+            totalNewForms.value = currentFormsCount + 1;
+            copyFormTarget.appendChild(copyEmptyForm);
+        }
+    });
+</script>
+
+
+{% endblock %}

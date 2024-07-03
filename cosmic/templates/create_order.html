@@ -1,0 +1,723 @@
+{% extends "cosmic_base.html" %}
+{% load widget_tweaks %}
+
+
+{% block content %}
+{% if form_errors %}
+  <ul>
+    {% for field in form %}
+      {% for error in field.errors %}
+        <li>{{ error }}</li>
+      {% endfor %}
+    {% endfor %}
+  </ul>
+{% endif %}
+{% if error_message %}
+    <div class="alert alert-danger">
+      {{ error_message }}
+    </div>
+    {% endif %}
+    {{ form.non_field_errors }}
+    
+    <div style="background-color: aqua;">
+      {{ form_errors }}
+    </div>
+
+    <div class="container d-flex justify-content-center align-items-center" style="font-size: small; margin: auto;">
+        <div class="card" style="min-width: 90%;">
+            <div class="card-body form-floating">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div>
+                        <span class="col-sm-3"></span>
+                        <strong><h1 style="font-weight: 700;">Create Order</h1></strong>
+                    </div>
+                    <div id="error-container" style="height:50px;">
+                        <!-- Errors will be displayed here -->
+                    </div>
+                    
+                    {% if form.errors %}
+                    <ul>
+                      {% for field in form %}
+                        {% for error in field.errors %}
+                          <li>{{ error }}</li>
+                        {% endfor %}
+                      {% endfor %}
+                    </ul>
+                  {% endif %}
+        
+                    <br>
+        
+        
+                    <form method="post" action="{% url 'create_orders' %}" id="form1">
+                        {% csrf_token %}
+                        <div class="row">
+                        <div class="col-sm-5">
+                            <span class="form-group">
+                                <label class="control-label col-sm-8"> Order Number <span style="color: rgb(187, 17, 17);">*</span></label>
+                                <div class="col-sm-11">
+        
+                                    <input type="text" class="form-control" name="order_no">
+                                </div>
+                            </span>
+                            <span class="form-group">
+                                <label class="control-label col-sm-8"> Proforma Ref. No <span style="color: rgb(187, 17, 17);">*</span></label>
+                                <div class="col-sm-11">
+        
+                                    <input type="text" class="form-control" name="ref_no">
+                                </div>
+        
+                            </span>
+                            <span class="form-group">
+                                <label class="control-label col-sm-8">Buyer <span style="color: rgb(187, 17, 17);">*</span></label>
+                                <div class="col-sm-11">
+                                    <input type="text" list="the_orders2" class="form-control" name="customer_name">
+                                    <datalist id="the_orders2">
+                                        {% for customer in customers %}
+                                        <option value="{{customer.customer_name}}"></option>
+                                        {% endfor %}
+                                    </datalist>
+                                </div>
+        
+                            </span>
+                            <span class="form-group">
+                                <label class="control-label col-sm-8">Add Consignee </label>
+                                        <div class="col-sm-11">
+                                            <input type="text" list="the_orders5" class="form-control" name="consignee" >
+                                            <datalist id="the_orders5">
+                                                {% for customer in customers %}
+                                                <option value="{{customer.customer_name}}"></option>
+                                                {% endfor %}
+                                            </datalist>
+                                        </div>
+        
+                            </span>
+                         
+        
+                        </div>
+        
+                       
+                            <div class="col-sm-5">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-10">Order Date <span style="color: rgb(187, 17, 17);padding-top: 0;">*</span></label>
+                                    <div class="col-sm-11">
+                                        <input type="date" name="date" class="form-control datetimepicker-input"
+                                            data-target="#datepicker1" />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-sm-8">Shipper<span style="color: rgb(187, 17, 17);">*</span></label>
+                                    <div class="col-sm-11">
+                                        <input type="text" list="the_orders4" class="form-control" name="supplier_name">
+                                    <datalist id="the_orders4">
+                                        {% for supplier in suppliers %}
+                                        <option value="{{supplier.supplier_name}}"></option>
+                                        {% endfor %}
+                                    </datalist>
+                                    </div>
+            
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-sm-8">Notify Party</label>
+                                    <div class="col-sm-11">
+                                        <input type="text" list="the_orders7" class="form-control" name="notify_party">
+                                    <datalist id="the_orders7">
+                                        {% for customer in customers %}
+                                        <option value="{{customer.customer_name}}"></option>
+                                        {% endfor %}
+                                    </datalist>
+                                    </div>
+            
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-sm-8">Add Notify Party</label>
+                                    <div class="col-sm-11">
+                                        <input type="text" list="the_orders8" class="form-control" name="notify_party2">
+                                    <datalist id="the_orders8">
+                                        {% for customer in customers %}
+                                        <option value="{{customer.customer_name}}"></option>
+                                        {% endfor %}
+                                    </datalist>
+                                    </div>
+            
+                                </div>
+                            </div>
+                            
+                            
+                            
+                       </div>   
+                       <div class="row" style="margin-top: 20px;">
+                        <div class="col-sm-5">
+                            <span class="form-group">
+                                <label class="control-label col-sm-8"> Country of Origin<span style="color: rgb(187, 17, 17);">*</span></label>
+                                <div class="col-sm-11">
+        
+                                    <input type="text" class="form-control" name="country_of_origin" >
+                                </div>
+                            </span>
+        
+                            <span class="form-group">
+                                <label class="control-label col-sm-8">Final Destination<span style="color: rgb(187, 17, 17);">*</span></label>
+                                <div class="col-sm-11">
+                                    <input type="text" class="form-control" name="final_destination">
+                                    
+                                </div>
+        
+                            </span>      
+        
+                        </div>
+        
+                       
+                            <div class="col-sm-5">
+                                <span class="form-group">
+                                    <label class="control-label col-sm-8"> Port of Loading<span style="color: rgb(187, 17, 17);">*</span></label>
+                                    <div class="col-sm-11">
+            
+                                        <input type="text" class="form-control" name="port_of_loading" >
+                                    </div>
+                                </span>
+                                <div class="form-group">
+                                    <label class="control-label col-sm-8">Port of Discharge<span style="color: rgb(187, 17, 17);">*</span></label>
+                                    <div class="col-sm-11">
+                                        <input type="text" class="form-control" name="port_of_discharge" >
+                                        
+                                    </div>
+
+                                </div>
+
+                               
+                                <!--
+                                    <div class="form-group">
+                                    <label class="control-label col-sm-8">Consignee<span style="color: rgb(187, 17, 17);">*</span></label>
+                                    <div class="col-sm-11">
+                                        <input type="text" list="the_orders" class="form-control" name="notify_party">
+                                        <datalist id="the_orders">
+                                            {% for customer in customers %}
+                                            <option value="{{customer.customer_name}}"></option>
+                                            {% endfor %}
+                                        </datalist>
+                                    </div>
+            
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-sm-8">Notify Party 2</label>
+                                    <div class="col-sm-11">
+                                        <input type="text" list="the_orders3" class="form-control" name="notify_party2">
+                                        <datalist id="the_orders3">
+                                            {% for customer in customers %}
+                                            <option value="{{customer.customer_name}}"></option>
+                                            {% endfor %}
+                                        </datalist>
+                                    </div>
+            
+                                </div> -->
+                            </div>
+                            
+                            
+                       </div>
+                        <div class="col-sm-12" style="display: block;">
+        
+                            <div class="row">
+                                <div class="col-sm-3">
+                                    <label for=""  style="font-weight: 700;font-size: medium;">Measurement Type</label>
+                                    <div class="radio-group">
+                                        <div>
+                                            <input type="radio" name="measurement_type" value="tons" id="tons">
+                                            <label for="tons">Metric Tons</label>
+                                        </div>
+                                        <div>
+                                            <input type="radio" name="measurement_type" value="kgs" id="kgs">
+                                            <label for="kgs">KGs</label>
+                                        </div>
+                                        <div>
+                                            <input type="radio" name="measurement_type" value="meters" id="meters">
+                                            <label for="meters">Meters</label>
+                                        </div>
+                                        <div>
+                                            <input type="radio" name="measurement_type" value="meters" id="ltrs">
+                                            <label for="ltrs">Ltr</label>
+                                        </div>
+                                        <div>
+                                            <input type="radio" name="measurement_type" value="pieces" id="pieces">
+                                            <label for="pieces">PCs</label>
+                                        </div>
+                                        <div>
+                                            <input type="radio" name="measurement_type" value="spools" id="spools">
+                                            <label for="spools">Spools</label>
+                                        </div>
+                                        <div>
+                                            <input type="radio" name="measurement_type" value="sets" id="sets">
+                                            <label for="sets">Sets</label>
+                                        </div>
+                                        <div>
+                                            <input type="radio" name="measurement_type" value="other" id="other">
+                                            <label for="other">Other</label>
+                                        </div>
+                        
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <label for=""  style="font-weight: 700;font-size: medium;">Payment Terms</label>
+                                    <div class="radio-group">
+                                        <div>
+                                            <input type="radio" name="payment_type" value="Irrevocable LC at Sight" id="lc-sight">
+                                            <label for="lc-sight">Irrevocable LC at Sight</label>
+                                        </div>
+                                        <div>
+                                            <input type="radio" name="payment_type" value="Cash Against Doc" id="cash-doc">
+                                            <label for="cash-doc">Cash Against Doc</label>
+                                        </div>
+                                        <div>
+                                            <input type="radio" name="payment_type" value="Telegraphic Transfer" id="telegraphic-transfer">
+                                            <label for="telegraphic-transfer">Telegraphic Transfer</label>
+                                        </div>
+                                        <div>
+                                            <input type="radio" name="payment_type" value="Confirmed LC" id="confirmed-lc">
+                                            <label for="confirmed-lc">Confirmed LC</label>
+                                        </div>
+                                        <div>
+                                            <input type="radio" name="payment_type" value="Deferred LC" id="deferred-lc">
+                                            <label for="deferred-lc">Deferred LC</label>
+                                        </div>
+                                        <div>
+                                            <input type="radio" name="payment_type" value="Franco Valuta" id="franco-valuta">
+                                            <label for="franco-valuta">Franco Valuta</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-3">
+                                    <label for=""  style="font-weight: 700;font-size: medium;">Mode of Transport</label>
+                                    <div class="radio-group">
+                                        <div>
+                                            <input type="radio" name="transportation" value="Sea" id="sea">
+                                            <label for="lc-sight">Sea</label>
+                                        </div>
+                                        <div>
+                                            <input type="radio" name="transportation" value="Air" id="air">
+                                            <label for="cash-doc">Air</label>
+                                        </div>
+                                        <div>
+                                            <input type="radio" name="transportation" value="Truck" id="truck">
+                                            <label for="telegraphic-transfer">Truck</label>
+                                        </div>
+                                        <div>
+                                            <input type="radio" name="transportation" value="Train" id="train">
+                                            <label for="telegraphic-transfer">Train</label>
+                                        </div>
+                        
+                                    </div>
+                                </div>
+                                
+                            </div>
+                           
+                            
+                            
+                        </div>
+                        <div class="col-sm-12" style="display: flex;margin-top: 15px;">
+                            <div class="col-sm-3">
+                                <label for="" style="font-weight: 700;font-size: medium;">Freight </label>
+                                <div class="radio-group" style="margin-bottom: 17px;">
+                                    <div>
+                                        <input type="radio" name="freight" value="Payable at Destination" id="payable_at_destination">
+                                        <label for="payable_at_destination">Payable at Destination</label>
+                                    </div>
+                                    
+                                    <div>
+                                        <input type="radio" name="freight" value="Pre-paid" id="pre_paid">
+                                        <label for="pre_paid">Pre-paid</label>
+                                    </div>
+                        
+                                </div>
+                                <span class="form-group" >
+                                    <label class="control-label col-sm-10" style="padding: 0;"> Freight Price</label>
+                                    
+                                    <input type="text" class="form-control" name="freight_price" id="freight_price">
+                                  
+                                </span>
+                            </div>
+                            <div class="col-sm-3">
+                                <label for=""  style="font-weight: 700;font-size: medium;">Shipment Type</label>
+                                <div class="radio-group">
+                                    <div>
+                                        <input type="radio" name="shipment_type" value="FOB" id="fob">
+                                        <label for="fob">FOB</label>
+                                    </div>
+                                    <div>
+                                        <input type="radio" name="shipment_type" value="CFR" id="cfr">
+                                        <label for="cfr">CFR</label>
+                                    </div>
+                                    <div>
+                                        <input type="radio" name="shipment_type" value="FCA" id="fca">
+                                        <label for="fca">FCA</label>
+                                    </div>
+                                    <div>
+                                        <input type="radio" name="shipment_type" value="CIF" id="cif">
+                                        <label for="cif">CIF</label>
+                                    </div>
+                                    <div>
+                                        <input type="radio" name="shipment_type" value="air_freight" id="air_freight">
+                                        <label for="air_freight">Air Freight</label>
+                                    </div>
+                        
+                                </div>
+                            </div>
+                            <div class="col-sm-7">
+                                <div id="input_cfr" style="display: none" class="col-sm-5">
+                                    <label for="fob_label">Freight Price </label>
+                                    <input type="text"  class="form-control col-sm-5" name="freight1">
+                                </div>
+                                <div id="input_fca" style="display: none;" class="col-sm-5">
+                                    <div>
+                                        <label for="fob_label">Freight Price </label>
+                                        <input type="text"  class="form-control col-sm-5" name="freight2">
+                                    </div>
+                                    <div  style=" margin-top: 20px">
+                                        <label for="fob_label" style=" margin-top: 20px">Djbouti Costs </label>
+                                        <input type="text"  class="form-control col-sm-5" name="djbouti_costs">
+                                    </div>
+                                </div>
+                            </div>
+                           
+                        </div>
+        
+                    </form>
+                </div>
+            </div>
+        </div>
+ </div></div>  
+ <div class="container d-flex justify-content-center align-items-center" style="font-size: small; ">
+    <div class="card" style="max-width: 1200px;">
+        <div class="card-body form-floating">
+    <div class="row">
+        <div class="col-md-12" style="font-size: small;">
+            {% if pr_form.errors %}
+            <div class="alert alert-danger">
+                <strong>Error(s) occurred:</strong>
+                <ul>
+                    {% for field, errors in pr_form.errors.items %}
+                    {% for error in errors %}
+                    <li>{{ field }}: {{ error }}</li>
+                    {% endfor %}
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+
+
+            <form method="post" action="{% url 'create_order_items' %}" id="form2">
+                {% csrf_token %}
+
+                {{ formset.management_form }}
+                {% for formset_error in formset.non_form_errors %}
+                <p>{{ formset_error }}</p>
+              {% endfor %}
+                <div id="form-lists" >
+                    {% for form in formset %}
+                    
+                    <div class="card-body row item-list form-group col-md-5">
+
+                        {{form.as_p}}
+
+                    </div>
+
+                    {% endfor %}
+                </div>
+
+                <div id="empty-form" class="hidden"> {{ formset.empty_form.as_p}}</div>
+                <button id="add-more" class="btn btn-primary" type="button" style="background-image:url('../static/back1.PNG');color: aliceblue;">Add Item</button>
+
+               
+                
+
+            </form>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <button id="submitss" class="col-sm-3 btn-lg"
+                style="background-image:url('../static/back1.PNG');color: aliceblue; padding: 8px 16px;font-weight: bolder;">
+                Calculate Total
+            </button>
+            <span class=" col-sm-4">
+                <p id="total-vat" name="total-vat"
+                    style="height:50px; font-weight:bolder; font-size: 22px; color: black;"></p>
+            </span>
+    
+        </div>
+    </div>
+</div>
+<div class="container" style="font-size: medium;margin-top: 0px;">
+    
+    
+
+    <div class="row">
+        <div class="col-sm-3"></div>
+        <div class="col-sm-5">
+            
+            <button id="submits" class="col-sm-7 btn-lg " 
+            style="background-image:url('../static/back1.PNG');color: aliceblue; margin-left: 100px;font-size: 24px; height: 62px; font-weight: bolder;">
+                Submit
+            </button>
+            <span style="margin: 10px;"></span>
+            <!-- <a href="" class="btn btn-default" style="font-size: large; margin-top: 5px;">Cancel</a> -->
+        </div>
+    </div>
+</div>
+</div></div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        //const radioButtons = document.querySelectorAll('input[type="radio"]');
+        
+        const radioButtons = document.querySelectorAll('.measurement_type');
+        const submitsButton = document.querySelector('#submitss');
+        const radioButtons2 = document.querySelectorAll('.payment_type');
+        const totalNewForms = document.getElementById('id_items-TOTAL_FORMS')
+        const submitButton = document.querySelector('#submits');
+        const addMoreBtn = document.getElementById('add-more');
+        const priceFields = document.querySelectorAll('.price');
+        const totalPriceField = $('#total-price');
+        const totalVatField = $('#total-vat');
+        const quantityFields = $('.quantity');
+        const dropdowns = document.querySelectorAll('.item_name');
+        
+        function updateCode(form) {
+            var itemId = form.find('.item_name').val();
+            form.find('.hs_codeS').val(3);
+            console.log(itemId)
+        }
+
+        $('.item-list').each(function () {
+            var form = $(this);
+            updateTotalPrice(form);
+            fetchCodes(form);
+        });
+
+        $(document).on('change', '.item-list .item_name', function () {
+            var form = $(this).closest('.item-list');
+            var itemId = form.find('.item_name').val();
+           
+                // Make AJAX request to Django view
+                fetch(`get_item_data/${itemId}/`)
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log(data.code, "code");
+                        // Update corresponding output div with fetched data
+                        var codes= form.find('.hs_codes').val(data.code); 
+                         
+                    })
+                    .catch(error => console.error('Error:', error));
+            
+        });
+        function fetchCodes(form){
+        
+dropdowns.forEach(function(dropdown) {
+    
+    dropdown.addEventListener("change", function() {
+        var form = $(this).closest('.item-list');
+        //updateCode(form);
+        const formsets = $('.item-list');
+        const itemId = dropdown.value;
+        const codes = document.querySelectorAll('.hs_code');
+        console.log(itemId, "id");
+        $('.item-list').each(function() {
+            // Within each formset, select the 'total_price' fields
+            const itemId = $(this).find('.item_name');
+            const code = $(this).find('.hs_codes');
+            
+            console.log(itemId, "id2");
+            itemId.each(function() {
+                const name = $(this).val();
+                console.log(name, "name");
+                // Make AJAX request to Django view
+                fetch(`get_item_data/${name}/`)
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log(data.code, "code");
+                        // Update corresponding output div with fetched data
+                        code.val(data.code); 
+                         
+                    })
+                    .catch(error => console.error('Error:', error));
+            });
+            
+            const codeInput = $(this).find('.hs_codes');
+            //codeInput.val("is");
+        });
+    });
+});
+        };
+
+        addMoreBtn.addEventListener('click', add_new_form);
+        submitsButton.addEventListener('click', function (event) {
+            event.preventDefault();
+            calculateTotalPrice();
+        });
+
+        var univ_total = 0
+        var univ_vat = 0
+        function calculateTotalPrice() {
+        var total = 0
+        var total_vat = 0
+        var originalTotal = 0;
+        var originalVat = 0;
+        var freight = document.getElementById('freight_price');
+        
+        const formsets = $('.item-list');
+        const total_price_fields = document.querySelectorAll('.total_price');
+        const total_vat_fields = document.querySelectorAll('.before_vat');
+        //const discountApplied = discount_checkbox.checked;
+        var freightElement = document.getElementById('freight_price');
+
+        var freight = 0;
+        if (freightElement) {
+            freight = parseFloat(freightElement.value) || 0;
+        }
+        $('.item-list').each(function() {
+            
+        
+            // Within each formset, select the 'total_price' fields
+            const totalFields = $(this).find('.total_price');
+            const vatFields = $(this).find('.before_vat');
+            totalFields.each(function() {
+            const price = parseFloat($(this).val()) || 0;
+         
+            total += price;
+            originalTotal += price; 
+            });
+            vatFields.each(function() {
+            const vat_price = parseFloat($(this).val()) || 0;
+            total_vat += vat_price;
+            originalVat += vat_price;
+          
+            });
+            
+            console.log(total)
+            var total_with_freight = total_vat + freight;
+            univ_total = total;
+            univ_vat = total_vat;
+            totalVatField.val(total_with_freight.toFixed(2));  // Update the 'value' of the field
+            totalVatField.text('Total Price: $' + total_with_freight.toFixed(2));  // Update the displayed text
+        });
+    }
+    calculateTotalPrice();
+        
+    submitButton.addEventListener('click', function (event) {
+            event.preventDefault(); // Prevent the default form submission
+
+            // Serialize form data
+            const formData1 = new FormData(form1);
+            const formData2 = new FormData(form2);
+
+            const prNoValue = formData1.get('order_no');
+
+            //formData1.set('PR_total_price', univ_total);
+            formData1.set('PR_before_vat', univ_vat);
+            
+          
+            const amount = 1
+           
+            console.log(prNoValue)
+            formData2.append('order_no', prNoValue)
+
+            // Use fetch to submit both forms asynchronously
+            fetch(form1.action, {
+    method: 'POST',
+    body: formData1
+})
+.then(response => {
+    if (!response.ok) {
+        // console.log(form_errors)
+        return response.json().then(data => {
+            // Display form 1 errors in the error container
+            const errorContainer = document.getElementById('error-container');
+            errorContainer.innerHTML = ''; // Clear previous errors
+            if (data.form_errors) {
+                const errorList = document.createElement('ul');
+                for (const key in data.form_errors) {
+                    if (Object.prototype.hasOwnProperty.call(data.form_errors, key)) {
+                        const errorItem = document.createElement('li');
+                        errorItem.textContent = `${key}: ${data.form_errors[key]}`;
+                        errorList.appendChild(errorItem);
+                    }
+                }
+                errorContainer.appendChild(errorList);
+            }
+        });
+    }else {
+        // If the response is successful, proceed to the next form submission
+        return fetch(form2.action, {
+            method: 'POST',
+            body: formData2
+        });
+    }
+})
+.then(response => {
+    if (response && !response.ok) {
+        // Handle errors from the second form submission, if any
+        return response.json().then(data => {
+            // 'data' will contain the form errors returned from the server
+            // Update the UI to display these errors to the user
+            console.log('Form 2 errors:', data.form_errors);
+            // Display the errors in the UI
+        });
+    } else {
+        // Handle success or no error from the second form submission
+        // Reload the page or do any other necessary action
+        document.getElementById('form1').reset();
+        document.getElementById('form2').reset();
+
+        window.location.reload();
+    }
+})
+.catch(error => {
+    console.error('Error:', error);
+});
+        });
+        function updateTotalPrice(form) {
+            var quantity = parseFloat(form.find('.quantity').val());
+            var price = parseFloat(form.find('.price').val());
+            var total = quantity * price || 0;
+            var total_price = total + (total * 0.15)
+            form.find('.before_vat').val(total.toFixed(2));
+            form.find('.total_price').val(total_price.toFixed(2));
+        }
+
+        $(document).on('input', '.item-list .quantity, .item-list .price', function () {
+            var form = $(this).closest('.item-list');
+            updateTotalPrice(form);
+        });
+
+        // Apply initial calculation for existing forms
+        $('.item-list').each(function () {
+            var form = $(this);
+            updateTotalPrice(form);
+        });
+        function add_new_form(args) {
+            // Your code to add a new form here
+            const currentForms = document.getElementsByClassName('item-list')
+            let currentFormsCount = currentForms.length + 1
+            console.log(currentForms.length)
+            console.log(totalNewForms);
+            const copyFormTarget = document.getElementById('form-lists')
+            const copyEmptyForm = document.getElementById('empty-form').cloneNode(true);
+            copyEmptyForm.setAttribute('class', 'item-list form-group col-md-5 text-dark')
+            copyEmptyForm.setAttribute('id', `form-${currentFormsCount}`)
+            // Clear input values in the cloned form
+            const regex = new RegExp('__prefix__', 'g')
+            copyEmptyForm.querySelectorAll('input').forEach(function (input) {
+                input.value = '';
+            });
+            copyEmptyForm.innerHTML = copyEmptyForm.innerHTML.replace(regex, currentFormsCount)
+            // Append the cloned form to the form list
+            totalNewForms.value = currentFormsCount + 1;
+            copyFormTarget.appendChild(copyEmptyForm);
+            const dropdowns = document.querySelectorAll('.item_name');
+            console.log(dropdowns,"drop")
+        }
+    
+});
+        
+</script>
+
+{% endblock %}

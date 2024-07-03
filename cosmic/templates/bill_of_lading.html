@@ -1,0 +1,265 @@
+{% extends 'cosmic_base.html' %}
+
+{% block content %}
+<div class="form-group ">
+    <tr style="margin-left: 100px;"><div class="mb-4" >
+        <div class="text-muted">           
+        <h4 class="mb-1 text-muted" >BILL OF LADING FOR COMBINED TRANSPORT AND SHIPMENTS</h4>
+        
+     </div>
+    <div class="table-responsive " style="display: flex;">
+        <table class="table table-nowrap mb-0">
+            <thead>
+                
+                <tr>
+                    <th style="width: 30%">
+                        <h4 class="text-muted text-sm-end font-size-15 mb-1">Shipper</h4>
+                        <div class="text-muted">
+                            <p class="mb-1" style="line-height: 1.2;font-size: small;">{{my_order.supplier_name.supplier_name}} <br>
+                                {{my_order.supplier_name.supplier_address}}</p>
+
+                        </div>
+                    </th>
+                    <th >
+                        <div class="col-sm-5" style="width: 140px;padding: 0;">
+                            <div class="text-muted text-sm-end">
+                                <div class="mt-4">
+                                    <h5 class="font-size-15 mb-1" style="margin: 0;">Invoice Date:</h5>
+                                    <p style="margin: 0;">{{shipping.invoice_date}}</p>
+                            </div>
+                                <!-- <div class="mt-4">
+                                    <h5 class="font-size-15 mb-1" style="margin: 0;">Invoice Date:</h5>
+                                    <p style="margin: 0;font-size: small;">{{my_order.date}}</p>
+                                </div> -->
+
+
+                            </div>
+                        </div>
+                    </th>
+                  
+                    <th>
+                        <div class="text-muted" >
+                            <h5 class="font-size-15 mb-1">Customer Ref. no</h5>
+                            <p class="mb-1">{{shipping.customer_no}}</p>
+                            
+                        </div>
+                        <!-- <div class="text-muted">
+                            <h5 class="font-size-15 mb-1">Shipper's Ref. no</h5>
+                                    <p>1111</p>
+                            
+                        </div> -->
+                    </th>
+                </tr>
+            </thead><!-- end thead -->
+            <tbody>
+                <tr>
+                    <th style="width: 400px;">
+                        <h4 class="text-muted text-sm-end font-size-13 mb-1">Buyer Details</h4>
+                        <div class="text-muted font-size: small;">
+                            <p class="mb-1 font-size-11" style="line-height: 1.2; font-size: small;">{{my_order.customer_name.customer_name}} <br>
+                                {{my_order.customer_name.customer_address}}</p>
+
+                        </div>
+                        
+                    </th>
+                    <th>
+                        <div class="text-muted">
+                            <h5 class="font-size-15 mb-1" style="line-height: 0.7;">Port of Loading</h5>
+                            <p class="mb-1" style="line-height: 1.2;font-size: small;">{{my_order.port_of_loading}}</p>
+
+                        </div>
+                        <div class="text-muted">
+                            <h5 class="font-size-15 mb-1" style="line-height: 0.7;">Port Of Discharge</h5>
+                            <p class="mb-1" style="line-height: 1.2;font-size: small;">{{my_order.port_of_discharge}}</p>
+
+                        </div>
+                        
+                        <div class="text-muted">
+                            <h5 class="text-muted text-sm-end font-size-15 mb-1" style="line-height: 0.7;">Means of
+                                Transport</h5>
+                            <!-- <p class="mb-1">Bole Sub city, Kebele 02,House No. 393/2</p> -->
+                            <p class="mb-1" style="font-size: small;line-height: 1.2;">{{my_order.transportation}}</p>
+                        </div>
+                    </th>
+                    <th>
+                        <div class="text-muted">
+                            <h5 class="font-size-15 mb-1 text-sm-end" style="line-height: 0.7;">Country of Origin</h5>
+                            <p class="mb-1" style="line-height: 1.2;font-size: small;">{{my_order.country_of_origin}}</p>
+
+                        </div>
+                        <div class="text-muted">
+                            <h5 class="font-size-15 mb-1 text-sm-end" style="line-height: 0.7;">Final Destination</h5>
+                            <p class="mb-1" style="line-height: 1.2;font-size: small;">{{my_order.final_destination}}</p>
+
+                        </div>
+                        <div class="text-muted">
+                            <h5 class="text-muted text-sm-end font-size-15 mb-1" style="line-height: 0.7;"> Shipment Terms</h5>
+                            <!-- <p class="mb-1">Bole Sub city, Kebele 02,House No. 393/2</p> -->
+                            <p class="mb-1" style="font-size: small;line-height: 1.2;">{{my_order.shipment_type}}</p>
+                        </div>
+                    </th>
+
+
+                   
+                <!--  
+                        
+                                    <tr>
+                                        <th scope="row" colspan="4" class="border-0 text-end">Total</th>
+                                        <td class="border-0 text-end"><h4 class="m-0 fw-semibold" id="final_pric"></h4></td>
+                                    </tr> -->
+
+
+                </tr>
+                <tr>
+                    <th>
+                        
+                        <h4 class="text-muted text-sm-end font-size-15 mb-1">Cosignee</h4>
+                        <div class="text-muted">
+                            <p class="mb-1" style="line-height: 1.2; font-size: small;">{{my_order.consignee.customer_name}} <br>
+                                {{my_order.consignee.customer_address}}</p>
+                            
+                        </div>
+                    </th>
+                    <th style="width: 30%">
+                        <h5 class="text-muted text-sm-end font-size-15 mb-1" style="line-height: 0.7;">Notify Party</h5>
+                       
+                            <p class="mb-1" style="line-height: 1.2;font-size: small;">{{my_order.supplier_name.supplier_name}} <br>
+                                {{my_order.supplier_name.supplier_address}}</p>
+
+                     
+                    </th>
+                    {% if shipping.notify_party2 %}
+                    <th style="width: 30%">
+                        <h5 class="text-muted text-sm-end font-size-15 mb-1" style="line-height: 0.7;">Notify Party</h5>
+                        <div class="text-muted">
+                            <p class="mb-1" style="line-height: 1.2;font-size: small;">{{my_order.notify_party.customer_name}} <br>
+                                {{my_order.notify_party.customer_address}}</p>
+
+                        </div>
+                    </th>
+                    {%endif%}
+                    <th>
+                        <div class="text-muted" >
+                            <h5 class="text-muted text-sm-end font-size-15 mb-1" style="line-height: 0.7;">Waybill Number</h5>
+                            <p class="mb-1" style="line-height: 1.2;font-size: small;">{{shipping.truck_waybill_no}}</p>
+                            
+                        </div>
+                       <div class="text-muted">
+                        <h5 class="text-muted text-sm-end font-size-15 mb-1" style="line-height: 0.7;">Vessel Name</h5>
+                                    <p class="mb-1" style="line-height: 1.2;font-size: small;">{{shipping.vessel}}</p>
+                            
+                        </div> 
+                        {% if shipping.bags%}
+                        <div class="text-muted">
+                            <h5 class="font-size-15 mb-1 ">No of Bags</h5>
+                            <p class="mb-1">{{shipping.bags}}</p>
+                            
+                        </div>
+                        {%endif%}
+                    </th>
+                   
+                </tr>
+                <!-- end tr -->
+            </tbody><!-- end tbody -->
+        </table><!-- end table -->
+    </div>
+    <!-- end row -->
+
+    <div class="py-2">
+      
+        <div class="table-responsive">
+            <table class="table align-middle table-nowrap table-centered mb-0">
+                <thead>
+                    <tr>
+                        <th style="width: 50px;">Container No.</th>
+                        <th>Description of Goods</th>
+                        <th>Measurement</th>
+                        <th>Net Wt. (Kg)</th>
+                        <th>Gross Wt. (Kg)</th>
+                       
+                        <!-- <th class="text-end" style="width: 120px;">Total</th> -->
+                    </tr>
+                </thead><!-- end thead -->
+                <tbody>
+
+
+                    {% if shipping_items %}
+                    {% for delivery in shipping_items %}
+                    <tr>
+                        <td style="font-weight: bold;width: 50px;word-wrap: break-word;">{{ shipping.container_no}}</td>
+                        <td>
+                            <div>
+                                <h5 class="text-truncate font-size-14 mb-1">{{delivery.item_name}}</h5>
+                                <p class="text-muted mb-0">HS-code:{{delivery.hs_code}}</p>
+                            </div>
+                        </td>
+                        {% if delivery.measurement%}
+                        <td>{{delivery.measurement}}</td>
+                        {%else%}
+                        <td>{{my_order.measurement_type}}</td>
+                        {%endif%}
+                        <td> {{delivery.net_weight}}</td>
+                        <td>{{delivery.gross_weight}}</td>
+                        <!-- <td> ${{delivery.total_price}} </td> -->
+                       
+                    </tr>
+                    {% endfor %}
+                    {% endif %}
+
+                    <!--  
+                            
+                                        <tr>
+                                            <th scope="row" colspan="4" class="border-0 text-end">Total</th>
+                                            <td class="border-0 text-end"><h4 class="m-0 fw-semibold" id="final_pric"></h4></td>
+                                        </tr> -->
+
+
+                    </tr>
+                    <!-- end tr -->
+                </tbody><!-- end tbody -->
+            </table><!-- end table -->
+        </div><!-- end table responsive -->
+        <!-- <div class="d-print-none mt-4">
+                                <div class="float-end">
+                                    <a href="javascript:window.print()" class="btn btn-success me-1"><i class="fa fa-print"></i></a>
+                                    <a href="#" class="btn btn-primary w-md">Send</a>
+                                </div>
+                            </div> -->
+
+        <hr>
+       
+        <div  style="margin-top: 0px;">
+            <p>{{shipping.lading_remark}}</p>
+        </div>
+    </div>
+    
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"
+    integrity="sha384-eMNCOe7tC1doHpGoWe/6oMVemdAVTMs2xqW4mwXrXsW0L84Iytr2wi5v2QjrP/xp"
+    crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.min.js"
+    integrity="sha384-cn7l7gDp0eyniUwwAZgrzD06kc/tftFf19TOAs2zVinnD/C7E91j9yyk5//jjpt/"
+    crossorigin="anonymous"></script>
+
+<script>
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const totalPrice = document.getElementById('total_price')
+        const shippingPriceElement = document.getElementById('shipping_price');
+        const finalPrice = document.getElementById('final_price')
+
+        var total_price = parseFloat(totalPrice.textContent);
+        var shippingPrice = parseFloat(shippingPriceElement.textContent);
+        console.log(shippingPrice)
+        shippingPrice = shippingPrice.toString()
+        var modifiedValue = shippingPrice.replace('$', '');
+        console.log(modifiedValue)
+        const price = total_price + final_price
+
+        finalPrice.innerHTML = price
+
+    })
+
+</script>
+{% endblock %}

@@ -1,0 +1,445 @@
+{% extends "cosmic_base.html" %}
+{% load widget_tweaks %}
+
+
+{% block content %}
+{% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+    <li{% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</li>
+        {% endfor %}
+</ul>
+{% endif %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <div>
+                <span class="col-md-3"></span>
+                <h1>Edit Purchase Order</h1>
+            </div>
+
+
+            <br>
+
+
+             <form method="post" action="{% url 'edit_order_only' %}" id="form1">
+                        {% csrf_token %}
+                        <div class="row">
+                        <div class="col-sm-5">
+                            <span class="form-group">
+                                <label class="control-label col-sm-8"> Order Number <span style="color: rgb(187, 17, 17);">*</span></label>
+                                <div class="col-sm-11">
+        
+                                    <input type="text" class="form-control" name="order_no" value="{{cosmic_order_instance.purchase_no}}" readonly>
+                                </div>
+                            </span>
+                            <span class="form-group">
+                                <label class="control-label col-sm-8"> Proforma Ref. No <span style="color: rgb(187, 17, 17);">*</span></label>
+                                <div class="col-sm-11">
+        
+                                    <input type="text" class="form-control" name="ref_no" value="{{cosmic_order_instance.ref_no}}">
+                                </div>
+        
+                            </span>
+        
+                            <span class="form-group">
+                                <label class="control-label col-sm-8">Buyer <span style="color: rgb(187, 17, 17);">*</span></label>
+                                <div class="col-sm-11">
+                                    <input type="text" list="the_orders2" class="form-control" name="customer_name" value="{{cosmic_order_instance.customer_name.customer_name}}">
+                                    <datalist id="the_orders2">
+                                        {% for customer in customers %}
+                                        <option value="{{customer.customer_name}}"></option>
+                                        {% endfor %}
+                                    </datalist>
+                                </div>
+        
+                            </span>
+                            <span class="form-group">
+                                <label class="control-label col-sm-8">Consignee <span style="color: rgb(187, 17, 17);">*</span></label>
+                                        <div class="col-sm-11">
+                                            <input type="text" list="the_orders5" class="form-control" name="consignee" value="{{cosmic_order_instance.consignee.customer_name}}">
+                                            <datalist id="the_orders5">
+                                                {% for customer in customers %}
+                                                <option value="{{customer.customer_name}}"></option>
+                                                {% endfor %}
+                                            </datalist>
+                                        </div>
+        
+                            </span>
+        
+        
+                        </div>
+        
+                       
+                            <div class="col-sm-5">
+                                
+                                
+                                 <div class="form-group">
+                                    <label class="control-label col-sm-8">Shipper<span style="color: rgb(187, 17, 17);">*</span></label>
+                                    <div class="col-sm-11">
+                                        <input type="text" list="the_orders4" class="form-control" name="supplier_name" value="{{cosmic_order_instance.supplier_name.supplier_name}}">
+                                    <datalist id="the_orders4">
+                                        {% for supplier in suppliers %}
+                                        <option value="{{supplier.supplier_name}}"></option>
+                                        {% endfor %}
+                                    </datalist>
+                                    </div>
+            
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-sm-8">Notify Party</label>
+                                    <div class="col-sm-11">
+                                        <input type="text" list="the_orders7" class="form-control" name="notify_party" value="{{cosmic_order_instance.notify_party.customer_name}}">
+                                    <datalist id="the_orders7">
+                                        {% for customer in customers %}
+                                        <option value="{{customer.customer_name}}"></option>
+                                        {% endfor %}
+                                    </datalist>
+                                    </div>
+            
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-sm-8">Add Notify Party<span style="color: rgb(187, 17, 17);">*</span></label>
+                                    <div class="col-sm-11">
+                                        <input type="text" list="the_orders8" class="form-control" name="notify_party2" value="{{cosmic_order_instance.notify_party2.customer_name}}">
+                                    <datalist id="the_orders8">
+                                        {% for customer in customers %}
+                                        <option value="{{customer.customer_name}}"></option>
+                                        {% endfor %}
+                                    </datalist>
+                                    </div>
+            
+                                </div>
+                                
+                            </div>
+                            
+                            
+                       </div>   
+                       <div class="row">
+                        <div class="col-sm-5">
+                            <span class="form-group">
+                                <label class="control-label col-sm-8"> Country of Origin<span style="color: rgb(187, 17, 17);">*</span></label>
+                                <div class="col-sm-11">
+        
+                                    <input type="text" class="form-control" name="country_of_origin" value="{{cosmic_order_instance.country_of_origin}}">
+                                </div>
+                            </span>
+        
+                            <span class="form-group">
+                                <label class="control-label col-sm-8">Final Destination<span style="color: rgb(187, 17, 17);">*</span></label>
+                                <div class="col-sm-11">
+                                    <input type="text" class="form-control" name="final_destination" value="{{cosmic_order_instance.final_destination}}">
+                                    
+                                </div>
+        
+                            </span>
+                            <!-- <span class="form-group">
+                                <label class="control-label col-sm-8">Total Price<span style="color: rgb(187, 17, 17);">*</span></label>
+                                <div class="col-sm-11">
+                                    <input type="text" class="form-control" name="PR_before_vat" value="{{cosmic_order_instance.PR_before_vat}}">
+                                    
+                                </div>
+        
+                            </span> -->
+        
+        
+                        </div>
+        
+                       
+                            <div class="col-sm-5" >
+                                <span class="form-group">
+                                    <label class="control-label col-sm-8"> Port of Loading<span style="color: rgb(187, 17, 17);">*</span></label>
+                                    <div class="col-sm-11">
+            
+                                        <input type="text" class="form-control" name="port_of_loading" value="{{cosmic_order_instance.port_of_loading}}">
+                                    </div>
+                                </span>
+                                <div class="form-group">
+                                    <label class="control-label col-sm-8">Port of Discharge<span style="color: rgb(187, 17, 17);">*</span></label>
+                                    <div class="col-sm-11">
+                                        <input type="text" class="form-control" name="port_of_discharge" value="{{cosmic_order_instance.port_of_discharge}}">
+                                        
+                                    </div>
+            
+                                </div>
+                               
+                            </div>
+                            
+                            
+                       </div> 
+        
+
+                        
+                        <div class="col-sm-12" style="display: block; margin-top: 30px;">
+        
+                            <div class="row">
+                                <div class="col-sm-3">
+                                    <label for="">Measurement Type</label>
+                                    <div class="radio-group">
+                                        <div>
+                                            <input type="radio" name="measurement_type" value="MT" id="MT" {% if cosmic_order_instance.measurement_type == 'MT'%} checked {% endif%}>
+                                            <label for="MT">Metric Tons</label>
+                                        </div>
+                                        <div>
+                                            <input type="radio" name="measurement_type" value="TONS" id="TONS" {% if cosmic_order_instance.measurement_type == 'TONS'%} checked {% endif%}>
+                                            <label for="TONS">TONS</label>
+                                        </div>
+                                        <div>
+                                            <input type="radio" name="measurement_type" value="kgs" id="kgs" {% if cosmic_order_instance.measurement_type == 'kgs'%} checked {% endif%}>
+                                            <label for="kgs">KGs</label>
+                                        </div>
+                                        <div>
+                                            <input type="radio" name="measurement_type" value="Meters" id="Meters" {% if cosmic_order_instance.measurement_type == 'Meters'%} checked {% endif%}>
+                                            <label for="Meters">Meters</label>
+                                        </div>
+                                        <div>
+                                            <input type="radio" name="measurement_type" value="Ltrs" id="ltrs" {% if cosmic_order_instance.measurement_type == 'Ltrs'%} checked {% endif%}>
+                                            <label for="Ltrs">LtrS</label>
+                                        </div>
+                                        <div>
+                                            <input type="radio" name="measurement_type" value="PCS" id="PCS" {% if cosmic_order_instance.measurement_type == 'PCS'%} checked {% endif%}>
+                                            <label for="PCS">PCS</label>
+                                        </div>
+                                        <div>
+                                            <input type="radio" name="measurement_type" value="spools" id="spools" {% if cosmic_order_instance.measurement_type == 'spools'%} checked {% endif%}>
+                                            <label for="spools">Spools</label>
+                                        </div>
+                                        <div>
+                                            <input type="radio" name="measurement_type" value="other" id="other">
+                                            <label for="other">Other</label>
+                                        </div>
+                        
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <label for="">Payment Terms</label>
+                                    <div class="radio-group">
+                                        <div>
+                                            <input type="radio" name="payment_type" value="Irrevocable LC at Sight" id="lc-sight" {% if cosmic_order_instance.payment_type == 'Irrevocable LC at Sight'%} checked {% endif%}>
+                                            <label for="lc-sight">Irrevocable LC at Sight</label>
+                                        </div>
+                                        <div>
+                                            <input type="radio" name="payment_type" value="Cash Against Doc" id="cash-doc" {% if cosmic_order_instance.payment_type == 'Cash Against Doc'%} checked {% endif%}>
+                                            <label for="cash-doc">Cash Against Doc</label>
+                                        </div>
+                                        <div>
+                                            <input type="radio" name="payment_type" value="Telegraphic Transfer" id="telegraphic-transfer" {% if cosmic_order_instance.payment_type == 'Telegraphic Transfer'%} checked {% endif%}>
+                                            <label for="telegraphic-transfer">Telegraphic Transfer</label>
+                                        </div>
+                                        <div>
+                                            <input type="radio" name="payment_type" value="Confirmed LC" id="confirmed-lc" {% if cosmic_order_instance.payment_type == 'Confirmed LC'%} checked {% endif%}>
+                                            <label for="confirmed-lc">Confirmed LC</label>
+                                        </div>
+                                        <div>
+                                            <input type="radio" name="payment_type" value="Deferred LC" id="deferred-lc" {% if cosmic_order_instance.payment_type == 'Deferred LC'%} checked {% endif%}>
+                                            <label for="deferred-lc">Deferred LC</label>
+                                        </div>
+                                        <div>
+                                            <input type="radio" name="payment_type" value="Franco Valuta" id="franco-valuta" {% if cosmic_order_instance.payment_type == 'Franco Valuta'%} checked {% endif%}>
+                                            <label for="franco-valuta">Franco Valuta</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-sm-3">
+                                    <label for="">Mode of Transport</label>
+                                    <div class="radio-group">
+                                        <div>
+                                            <input type="radio" name="transportation" value="Sea" id="Sea" {% if cosmic_order_instance.transportation == 'Sea' %} checked {% endif %}>
+                                            <label for="Sea">Sea</label>
+                                        </div>
+                                        <div>
+                                            <input type="radio" name="transportation" value="Air" id="Air" {% if cosmic_order_instance.transportation == "Air" %} checked {% endif %}>
+                                            <label for="Air">Air</label>
+                                        </div>
+                                        <div>
+                                            <input type="radio" name="transportation" value="Truck" id="Truck" {% if cosmic_order_instance.transportation == "Truck" %} checked {% endif %}>
+                                            <label for="Truck">Truck</label>
+                                        </div>
+                                        <div>
+                                            <input type="radio" name="transportation" value="Train" id="Train" {% if cosmic_order_instance.transportation == "Train" %} checked {% endif %}>
+                                            <label for="Train">Train</label>
+                                        </div>
+                        
+                                    </div>
+                                </div>
+                                
+                            </div>
+                           
+                            
+                            
+                        </div>
+                        <div class="col-sm-12" style="display: flex;">
+                            <div class="col-sm-3">
+                                <label for="">Freight </label>
+                                <div class="radio-group">
+                                    <div>
+                                        <input type="radio" name="freight" value="Payable at Destination" id="payable_at_destination" {% if cosmic_order_instance.freight == "Payable at Destination" %} checked {% endif %}>
+                                        <label for="payable_at_destination">Payable at Destination</label>
+                                    </div>
+                                    
+                                    <div>
+                                        <input type="radio" name="freight" value="Pre-paid" id="pre_paid" {% if cosmic_order_instance.freight == "Pre-paid" %} checked {% endif %}>
+                                        <label for="pre_paid">Pre-paid</label>
+                                    </div>
+                        
+                                </div>
+                            </div>
+                            <div class="col-sm-3">
+                                <label for="">Shipment Type</label>
+                                <div class="radio-group">
+                                    <div>
+                                        <input type="radio" name="shipment_type" value="FOB" id="fob" {% if cosmic_order_instance.shipment_type == "FOB" %} checked {% endif %}>
+                                        <label for="fob">FOB</label>
+                                    </div>
+                                    <div>
+                                        <input type="radio" name="shipment_type" value="CFR" id="cfr" {% if cosmic_order_instance.shipment_type == "CFR" %} checked {% endif %}>
+                                        <label for="cfr">CFR</label>
+                                    </div>
+                                    <div>
+                                        <input type="radio" name="shipment_type" value="FCA" id="fca" {% if cosmic_order_instance.shipment_type == "FCA" %} checked {% endif %}>
+                                        <label for="fca">FCA</label>
+                                    </div>
+                                    <div>
+                                        <input type="radio" name="shipment_type" value="CIF" id="cif" {% if cosmic_order_instance.shipment_type == "CIF" %} checked {% endif %}>
+                                        <label for="cif">CIF</label>
+                                    </div>
+                                    <div>
+                                        <input type="radio" name="shipment_type" value="air_freight" id="air_freight" {% if cosmic_order_instance.shipment_type == "air_freight" %} checked {% endif %}>
+                                        <label for="air_freight">Air Freight</label>
+                                    </div>
+                        
+                                </div>
+                            </div>
+                            <div class="col-sm-7">
+                                <div id="input_cfr" style="display: none" class="col-sm-5">
+                                    <label for="fob_label">Freight Price </label>
+                                    <input type="text"  class="form-control col-sm-5" name="freight1">
+                                </div>
+                                <div id="input_fca" style="display: none;" class="col-sm-5">
+                                    <div>
+                                        <label for="fob_label">Freight Price </label>
+                                        <input type="text"  class="form-control col-sm-5" name="freight2">
+                                    </div>
+                                    <div  style=" margin-top: 20px">
+                                        <label for="fob_label" style=" margin-top: 20px">Djbouti Costs </label>
+                                        <input type="text"  class="form-control col-sm-5" name="djbouti_costs">
+                                    </div>
+                                </div>
+                                <div id="input_cif" style="display: none;" class="col-sm-5">
+                                    <div>
+                                        <label for="fob_label">Freight Price </label>
+                                        <input type="text"  class="form-control col-sm-5" name="freight2">
+                                    </div>
+                                    <div  style=" margin-top: 20px">
+                                        <label for="fob_label" style=" margin-top: 20px">Insurance Costs </label>
+                                        <input type="text"  class="form-control col-sm-5" name="djbouti_costs">
+                                    </div>
+                                </div>
+                            </div>
+                           
+                        </div>
+        
+                    </form>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+<div class="container">
+
+    <div class="row">
+        <div class="col-sm-12">
+            <span style="margin: 10px;" class="col-sm-3"></span>
+            <button id="submits" class="col-sm-2 btn-lg " 
+            style="background-image:url('../static/back1.PNG');color: aliceblue; margin-left: 100px;font-size: 24px; height: 62px; font-weight: bolder;">
+                Submit
+            </button>
+            <span style="margin: 10px;"></span>
+            <!-- <a href="" class="btn btn-default" style="font-size: large; margin-top: 5px;">Cancel</a> -->
+        </div>
+    </div>
+</div>
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        //const radioButtons = document.querySelectorAll('input[type="radio"]');
+        const radioButtons = document.querySelectorAll('.measurement_type');
+        const submitButton = document.querySelector('#submits');
+        const radioButtons2 = document.querySelectorAll('.payment_type');
+        
+        console.log("try")
+       
+        radioButtons.forEach(button => {
+            button.addEventListener('change', function () {
+                // Hide all input elements
+                hideAllInputs();
+                console.log("trys")
+                // Show the input element corresponding to the selected radio button
+                const inputId = 'input_' + this.value;
+                const inputElement = document.getElementById(inputId);
+                if (inputElement) {
+                    inputElement.style.display = 'block';
+                }
+            });
+        });
+        
+        
+        submitButton.addEventListener('click', function (event) {
+            event.preventDefault(); // Prevent the default form submission
+
+            // Serialize form data
+            const formData1 = new FormData(form1);
+            //console.log(univ_total,"tots")
+            //const freightPrice = formData1.get('freight1');
+            const prNoValue = formData1.get('order_no');
+            //formData1.set('PR_total_price', univ_total);
+          
+            
+          
+            // Use fetch to submit both forms asynchronously
+            fetch(form1.action, {
+    method: 'POST',
+    body: formData1
+})
+.then(response => {
+    if (!response.ok) {
+        return response.json().then(data => {
+            const errorContainer = document.getElementById('error-container');
+            errorContainer.innerHTML = '';
+            if (data.form_errors) {
+                const errorList = document.createElement('ul');
+                for (const key in data.form_errors) {
+                    if (Object.prototype.hasOwnProperty.call(data.form_errors, key)) {
+                        const errorItem = document.createElement('li');
+                        errorItem.textContent = `${key}: ${data.form_errors[key]}`;
+                        errorList.appendChild(errorItem);
+                    }
+                }
+                errorContainer.appendChild(errorList);
+            }
+        });
+    } 
+    else {
+        alert("Order Edited!")
+        window.location.reload();
+    }
+})
+
+
+.catch(error => {
+    // console.error('Error submitting forms:', error);
+    // Handle any general errors during form submission
+});
+        });
+        
+
+       
+    });
+</script>
+
+
+{% endblock %}
