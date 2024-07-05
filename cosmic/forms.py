@@ -89,7 +89,7 @@ class PurchaseItemForm(forms.ModelForm):
     measurement = forms.CharField(widget=forms.TextInput(attrs={'class': 'measurement form-control'}), required=False)
     quantity = forms.FloatField(widget=forms.TextInput(attrs={'class': 'quantity form-control' }))
     price = forms.DecimalField(widget=forms.TextInput(attrs={'class': 'price form-control'}))
-    description = forms.CharField(widget=forms.TextInput(attrs={'class': 'description form-control'}))
+    # description = forms.CharField(widget=forms.TextInput(attrs={'class': 'description form-control'}))
         
     
     
