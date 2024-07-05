@@ -89,14 +89,14 @@ class PurchaseItemForm(forms.ModelForm):
     measurement = forms.CharField(widget=forms.TextInput(attrs={'class': 'measurement form-control'}), required=False)
     quantity = forms.FloatField(widget=forms.TextInput(attrs={'class': 'quantity form-control' }))
     price = forms.DecimalField(widget=forms.TextInput(attrs={'class': 'price form-control'}))
-    # description = forms.CharField(widget=forms.TextInput(attrs={'class': 'description form-control'}))
+    
         
     
     
     class Meta:
    
         model = purchase_item
-        fields = [ 'item_name','price','quantity','before_vat','measurement','description']
+        fields = [ 'item_name','price','quantity','before_vat','measurement']
         
 class CosmicPurchaseForm(forms.ModelForm):
     

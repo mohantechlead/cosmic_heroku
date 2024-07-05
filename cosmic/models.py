@@ -115,7 +115,6 @@ class purchase_item(models.Model):
     before_vat = models.FloatField(blank=True, null=True)
     quantity =  models.FloatField(blank=True, null=True)
     measurement = models.TextField(blank=True, null=True)
-    # description = models.TextField(blank=True, null=True)
     remaining = models.TextField(blank= True, null=True)
 
 class invoice_item(models.Model):
