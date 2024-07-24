@@ -1729,7 +1729,7 @@ def update_shipping(request):
     else:
         invoice_no = request.GET.get('invoice_num')
         shipping_instance = get_object_or_404(shipping_info, invoice_num=invoice_no)
-        shipping.final_price = 0.0
+        shipping_instance.final_price = 0.0
         date = shipping_instance.invoice_date
         date = str(date)
         invoice_item_formset = modelformset_factory(invoice_item, form=InvoiceItemForm, extra=0)
