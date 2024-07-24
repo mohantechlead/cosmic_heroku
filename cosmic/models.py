@@ -159,3 +159,19 @@ class cosmic_expense(models.Model):
    reference = models.TextField(blank=True, null=True)
    attachement = models.FileField(blank=True, null=True, upload_to="media/")
 
+class GRN(models.Model):
+    GRN_no = models.TextField(primary_key=True)
+    grn_date = models.DateField(blank=True, null=True)
+    recieved_from = models.TextField(blank=True, null=True)
+    transporter_name = models.TextField(blank=True, null=True)
+    truck_no = models.TextField(blank=True, null=True)
+    store_name =  models.TextField(blank=True, null=True) # This field type is a guess.
+    store_keeper = models.TextField(blank=True, null=True)
+    class Meta:
+        managed = False
+        db_table = 'GRN'
+
+class GRNItem(models.Model):
+    id = models.AutoField(primary_key=True)
+    quantity = models.FloatField(null=True, blank=True)
+    item_name = models.CharField(null=True, blank=True)

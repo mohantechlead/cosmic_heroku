@@ -1,0 +1,243 @@
+{% extends 'cosmic_base.html' %}
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+<div>
+    <span class="col-md-3" ></span>
+<h1>Create GRN</h1>
+</div>
+
+
+<br>
+
+<br>
+<form method="post" action="{% url 'create_grn' %}" id="form1">
+    {% csrf_token %}
+    <div class="form-group col-sm-8">
+        <label class="control-label col-sm-3" style="margin-top: 10px;">Recieved From</label>
+        <div>
+            <input type="text" list="vendor_name" placeholder="Name" name="vendor_name" class="form-control "
+              style="width: 100%;">
+            <datalist id="vendor_name"> 
+
+              {% for order in names %}
+              <option value="{{order.vendor_name}}"></option>
+              {% endfor %}
+            </datalist>
+          </div>
+    </div>
+    <div class="col-sm-6">
+        <span class="form-group">
+            <label class="control-label col-sm-4"> GRN Number</label>
+            <div class="col-sm-8">
+
+                <input type="text" class="form-control" name="GRN_no">
+            </div>
+        </span>
+        
+
+    </div>
+
+<div>
+    <div class="col-sm-5">
+        <div class="form-group">
+            <label class="control-label col-sm-4">Date</label>
+            <div class="col-sm-8">
+                <input type="date" name="grn_date" class="form-control datetimepicker-input" data-target="#datepicker1" />
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-8"></div>
+    <div class="col-sm-6">
+        <div class="form-group">
+            <label class="control-label col-sm-4">Transporter Name</label>
+            <div class="col-sm-8" style="margin-top: 10px;">
+                <input type="text" class="form-control" name="transporter_name">
+
+            </div>
+        </div>
+        <span class="form-group">
+            <label class="control-label col-sm-4"> Plate No</label>
+            <div class="col-sm-8">
+
+                <input type="text" class="form-control" name="truck_no">
+            </div>
+        </span>
+    </div>
+
+    <div class="col-sm-5">
+       
+
+        <div class="form-group" style="margin-bottom: 10px;">
+            <label class="control-label col-sm-4" style="margin-top: 10px;">Store Name</label>
+            <div class="col-sm-8" style="margin-top: 10px;">
+                <input type="text" list="store_name" placeholder="store" name="store_name" class="form-control "
+              style="width: 100%;">
+            <datalist id="store_name"> 
+                
+              {% for order in grns %}
+              <option value="{{order.store_name}}"></option>
+              {% endfor %}
+            </datalist>
+
+            </div>
+            <label class="control-label col-sm-4" style="margin-top: 10px;">Store Keeper</label>
+            <div class="col-sm-8" style="margin-top: 10px;">
+                <input type="text" list="store_keeper" placeholder="keeper" name="store_keeper" class="form-control "
+              style="width: 100%;">
+            <datalist id="store_keeper"> 
+                
+              {% for order in grns %}
+              <option value="{{order.store_keeper}}"></option>
+              {% endfor %}
+            </datalist>
+
+            </div>
+            
+        </div>
+    </div>
+    
+</div>
+
+</form>
+</div></div></div>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+           
+            <form method="post"  id="form2">
+                {% csrf_token %}
+
+                {{ formset.management_form }}
+
+                <div id="form-lists">
+                    {% for form in formset %}
+
+                    <div class="item-list card-body row form-group col-md-5">
+
+                        {{form.as_p}}
+
+                    </div>
+
+                    {% endfor %}
+                </div>
+
+                <div id="empty-form" class="hidden"> {{ formset.empty_form.as_p}}</div>
+                <button id="add-more" class="btn btn-primary" type="button">Add Item</button>
+
+              
+            
+            </form>
+        </div></div></div>
+
+        <button id="submits" class="col-sm-3 btn-lg " style="color: #6d7fcc; background-color: white; margin-left: 100px;">
+            Submits
+        </button>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                //const radioButtons = document.querySelectorAll('input[type="radio"]');
+               
+                const submitButton = document.querySelector('#submits');
+                const addMoreBtn = document.getElementById('add-more');
+               
+                const totalNewForms = document.getElementById('id_GRN_items-TOTAL_FORMS')
+                console.log(totalNewForms)
+                
+                addMoreBtn.addEventListener('click', add_new_form);
+           
+                submitButton.addEventListener('click', function (event) {
+                    event.preventDefault(); // Prevent the default form submission
+                    
+                    // Serialize form data
+                    const formData1 = new FormData(form1);
+                    const formData2 = new FormData(form2);
+        
+                   
+                    const prNoValue = formData1.get('PR_no');
+                    const grnNoValue = formData1.get('GRN_no');
+                   
+                    console.log(prNoValue)
+                    formData2.append('PR_no', prNoValue)
+                    formData2.append('GRN_no', grnNoValue)
+                    // Use fetch to submit both forms asynchronously
+                    fetch(form1.action, {
+                        method: 'POST',
+                        body: formData1
+                    })
+                    .then(response => {
+            if (!response.ok) {
+                return response.json().then(data => {
+                    // Display form 1 errors in the error container
+                    const errorContainer = document.getElementById('error-container');
+                    errorContainer.innerHTML = ''; // Clear previous errors
+                    if (data.form_errors) {
+                        const errorList = document.createElement('ul');
+                        for (const key in data.form_errors) {
+                            if (Object.prototype.hasOwnProperty.call(data.form_errors, key)) {
+                                const errorItem = document.createElement('li');
+                                errorItem.textContent = `${key}: ${data.form_errors[key]}`;
+                                errorList.appendChild(errorItem);
+                            }
+                        }
+                        errorContainer.appendChild(errorList);
+                    }
+                    // Throw an error to trigger the catch block
+                    throw new Error('Form 1 submission failed');
+                });
+            } else {
+                // If the response is successful, proceed to the next form submission
+                return fetch(form2.action, {
+                    method: 'POST',
+                    body: formData2
+                });
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                // Handle errors from the second form submission, if any
+                return response.json().then(data => {
+                    // Display form 2 errors in the UI
+                    console.log('Form 2 errors:', data.form_errors);
+                    // Handle the errors in the UI without reloading the page
+                });
+            } else {
+                // Handle success or no error from the second form submission
+                // Reload the page or perform other necessary actions
+                document.getElementById('form1').reset();
+                document.getElementById('form2').reset();
+
+                // Remove the code below if you don't want the page to reload
+                window.location.reload();
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+                        });
+                });
+             
+                function add_new_form(args) {
+                    // Your code to add a new form here
+                    const currentForms = document.getElementsByClassName('item-list')
+                    let currentFormsCount = currentForms.length + 1
+                    console.log(currentForms.length)
+                    console.log(totalNewForms); 
+                    console.log('luhana')
+                    const copyFormTarget = document.getElementById('form-lists')
+                    const copyEmptyForm = document.getElementById('empty-form').cloneNode(true);
+                    copyEmptyForm.setAttribute('class', 'item-list form-group col-md-5 text-dark')
+                    copyEmptyForm.setAttribute('id', `form-${currentFormsCount}`)
+        // Clear input values in the cloned form
+                    const regex = new RegExp('__prefix__','g')
+                    copyEmptyForm.querySelectorAll('input').forEach(function(input) {
+                        input.value = '';
+                    });
+                    copyEmptyForm.innerHTML = copyEmptyForm.innerHTML.replace(regex,currentFormsCount)
+                    // Append the cloned form to the form list
+                    totalNewForms.value = currentFormsCount + 1;
+                    copyFormTarget.appendChild(copyEmptyForm);
+                            }
+                        });
+        </script> 
+{% endblock %}

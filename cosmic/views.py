@@ -1758,91 +1758,25 @@ def get_item_data(request, item_id):
     except item_codes.DoesNotExist:
         return JsonResponse({'error': 'Item not found'}, status=404)
     
-def display_income(request):
-    income = cosmic_income.objects.all()
-   
-    return render(request, 'display_income.html', {'income':income})
-
-def display_expense(request):
-    expense = cosmic_expense.objects.all()
-
-    return render(request, 'display_expense.html', {'expense': expense})
-
-def create_income(request):
+def create_grn(request):
     if request.method == 'POST':
-        form = CosmicIncomeForm(request.POST)
-        if form.errors:
-            print(form.errors)
-        if form.is_valid():
-            try:
-                form.save()
-            except Exception as e:
-                print(f"Error: {e}")
-            return redirect('create_income')
-    
-    else:
-        
-        form = CosmicIncomeForm()
-    return render(request, 'create_income.html')
+        formset = formset_factory(GRNItem, extra=1, min_num=1)
+        formset = formset(request.POST or None,prefix="items")
 
-def print_expense(request):
-    pr_no = request.GET['serial_no']
-    if request.method == 'GET':
-     
-        expense = cosmic_expense.objects.get(serial_no=pr_no)
-    
-        dicts = {1:"TEN",2:"TWENTY",3:"THIRTY",4:"FORTY",5:"FIFTY",6:"SIXTY",7:"SEVENTY",8:"EIGHTY",9:"NINTY"}
-        number = float(expense.amount)
-        whole_part, decimal_part = str(number).split('.')
-        number_in_words = num2words(whole_part)
-        number_in_words = number_in_words.replace(',', '')
-        number_in_words = number_in_words.replace('-', ' ')
-        num = number_in_words.upper()
-        if int(decimal_part) in dicts:
-            dec = " AND " + str(dicts[int(decimal_part)]) + " CENTS ONLY"
-        elif decimal_part == "0":
-            dec = " ONLY"
-        else:
-            dec = " AND " + num2words(decimal_part) + " CENTS ONLY"
-        print(decimal_part,dec)
-        num = num.replace(' AND', '')
-        num += dec 
-        print(expense, num)
-        print("no")
-        context = {
-            'expense': expense,
-            'num': num,
-            'number':number,
-                   
-                   }
-        
-        # return render(request, 'print_expense.html',context)
-       
-    return render(request, 'print_expense.html', context)
+    formset = formset_factory(GRNItem, extra=1, min_num=1)
+    # formset = formset(request.POST or None,prefix="items")
+    context={
+        # 'form':form,
+        'formset':formset,
+    }
+    return render(request, 'create_grn.html',context)
 
-# def print_expense(request):
-#     return render(request, 'print_expense.html')
+def display_grn(request):
+    return render(request, 'display_grn.html')
 
-def create_expense(request):
-    # if request.method == 'POST':
-    #     form = CosmicExpenseForm(request.POST, request.FILES)
-    #     if form.errors:
-    #         print(form.errors)
-    #     if form.is_valid():
-    #         try:
-    #             form.save()
-    #         except Exception as e:
-    #             print(f"Error: {e}")
-    #         return redirect('create_expense')
-    
-    # else:
-    #     form = CosmicExpenseForm()
-    # return render(request, 'create_expense.html')
-    if request.method == 'POST':
-        form = CosmicExpenseForm(request.POST, request.FILES)
-        if form.is_valid():
-            form.save()
-            return redirect('create_expense')
-    else:
-        form = CosmicExpenseForm()
-    return render(request, 'create_expense.html', {'form': form})
+def create_dn(request):
+    return render(request, 'create_dn.html')
+
+def display_dn(request):
+    return render(request, 'display_dn.html')
+
