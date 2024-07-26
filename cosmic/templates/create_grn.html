@@ -100,9 +100,31 @@
     
 </div>
 
-</form>
-</div></div></div>
 
+</div>
+
+</div>
+<div>
+    
+    {{ formset.management_form }}
+
+    <div id="form-lists">
+        {% for form in formset %}
+
+        <div class="item-list card-body row form-group col-md-5">
+
+            {{form.as_p}}
+
+        </div>
+
+        {% endfor %}
+    </div>
+
+    <div id="empty-form" class="hidden"> {{ formset.empty_form.as_p}}</div>
+    <button id="add-more" class="btn btn-primary" type="button">Add Item</button>
+</div>
+</div>
+</form>
 <div class="container">
     <div class="row">
         <div class="col-md-12">
@@ -110,22 +132,6 @@
             <form method="post"  id="form2">
                 {% csrf_token %}
 
-                {{ formset.management_form }}
-
-                <div id="form-lists">
-                    {% for form in formset %}
-
-                    <div class="item-list card-body row form-group col-md-5">
-
-                        {{form.as_p}}
-
-                    </div>
-
-                    {% endfor %}
-                </div>
-
-                <div id="empty-form" class="hidden"> {{ formset.empty_form.as_p}}</div>
-                <button id="add-more" class="btn btn-primary" type="button">Add Item</button>
 
               
             
@@ -152,16 +158,11 @@
                     
                     // Serialize form data
                     const formData1 = new FormData(form1);
-                    const formData2 = new FormData(form2);
+                   
         
-                   
-                    const prNoValue = formData1.get('PR_no');
                     const grnNoValue = formData1.get('GRN_no');
+                
                    
-                    console.log(prNoValue)
-                    formData2.append('PR_no', prNoValue)
-                    formData2.append('GRN_no', grnNoValue)
-                    // Use fetch to submit both forms asynchronously
                     fetch(form1.action, {
                         method: 'POST',
                         body: formData1
@@ -186,35 +187,19 @@
                     // Throw an error to trigger the catch block
                     throw new Error('Form 1 submission failed');
                 });
-            } else {
-                // If the response is successful, proceed to the next form submission
-                return fetch(form2.action, {
-                    method: 'POST',
-                    body: formData2
-                });
-            }
+            } 
         })
         .then(response => {
-            if (!response.ok) {
-                // Handle errors from the second form submission, if any
-                return response.json().then(data => {
-                    // Display form 2 errors in the UI
-                    console.log('Form 2 errors:', data.form_errors);
-                    // Handle the errors in the UI without reloading the page
-                });
-            } else {
+             
                 // Handle success or no error from the second form submission
                 // Reload the page or perform other necessary actions
                 document.getElementById('form1').reset();
-                document.getElementById('form2').reset();
-
+                
                 // Remove the code below if you don't want the page to reload
                 window.location.reload();
-            }
+            
         })
-        .catch(error => {
-            console.error('Error:', error);
-                        });
+       
                 });
              
                 function add_new_form(args) {
@@ -223,7 +208,6 @@
                     let currentFormsCount = currentForms.length + 1
                     console.log(currentForms.length)
                     console.log(totalNewForms); 
-                    console.log('luhana')
                     const copyFormTarget = document.getElementById('form-lists')
                     const copyEmptyForm = document.getElementById('empty-form').cloneNode(true);
                     copyEmptyForm.setAttribute('class', 'item-list form-group col-md-5 text-dark')

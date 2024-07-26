@@ -1760,13 +1760,28 @@ def get_item_data(request, item_id):
     
 def create_grn(request):
     if request.method == 'POST':
-        formset = formset_factory(GRNItem, extra=1, min_num=1)
+        form = CosmicGRNForm(request.POST)
+        formset = formset_factory(CosmicGRNItemForm, extra=1, min_num=1)
         formset = formset(request.POST or None,prefix="items")
 
-    formset = formset_factory(GRNItem, extra=1, min_num=1)
-    # formset = formset(request.POST or None,prefix="items")
+        if form.is_valid():
+            form.save()
+        
+        if form.errors:
+            print(form.errors)
+
+        context={
+           'form':form,
+           'formset':formset, 
+        }
+
+        return render(request, 'create_grn.html',context)
+    form = CosmicGRNForm(request.POST)
+    
+    formset = formset_factory(CosmicGRNItemForm, extra=1)
+    formset = formset(request.POST or None,prefix="items")
     context={
-        # 'form':form,
+        'form':form,
         'formset':formset,
     }
     return render(request, 'create_grn.html',context)
