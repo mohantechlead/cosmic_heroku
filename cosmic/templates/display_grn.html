@@ -2,4 +2,74 @@
 
 {% block content %}
 
+  <div><h3 style="margin: 50px;">Display GRN</h3></div>
+
+ 
+  <div class="container">
+          
+                <table class="table table-striped table-bordered" style="margin-top: 20px;" id="example">
+                  <thead>
+                    <tr>
+                      <th style="text-align:left">GRN Number</th>
+                      <th>Date</th>
+                      <th>Item</th>
+                      <th>Quantity</th>
+                      <th>Plate No</th>
+                      <th>Store Name</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for grn in my_grn %}
+                    <tr>
+                      <td style="text-align:left"><a href="/cosmic/display_single_order/{{order.order_no}}" >{{ grn.GRN_no }}</a></td>
+                      <td>{{ grn.date }}</td>
+                      <td>
+                        {% for item in grn.grn_items.all %}
+                            {{ item.item_name }}
+                            {% if not forloop.last %}<br>{% endif %}
+                        {% endfor %}
+                    </td>
+                    <td>{% for item in grn.grn_items.all %}
+                      {{ item.quantity }}
+                      {% if not forloop.last %}<br>{% endif %}
+                  {% endfor %}</td>
+                                         
+                      
+                      <td>{{ grn.plate_no }}</td>
+                      <td>{{ grn.store_name }}</td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                  </table>
+  </div>
+           
+  
+
+  
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+      const orderLinks = document.querySelectorAll('.order-link');
+      console.log("p1")
+      orderLinks.forEach(function (link) {
+          link.addEventListener('click', function (event) {
+              event.preventDefault();
+              console.log("p2")
+              const orderID = this.getAttribute('data-order-id');
+              window.location.href = `/cosmic/display_single_order?order_no=${orderID}`;
+          });
+      });
+      const orderLinks2 = document.querySelectorAll('.order-link2');
+      console.log("p1")
+      orderLinks2.forEach(function (link) {
+          link.addEventListener('click', function (event) {
+              event.preventDefault();
+              console.log("p2")
+              const orderID = this.getAttribute('data-order-id');
+              window.location.href = `/GRN/display_single_order?PR_no=${orderID}`;
+          });
+      });
+  });
+</script>
 {% endblock %}

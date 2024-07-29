@@ -6,8 +6,6 @@ from django.conf.urls.static import  static,settings
 
 urlpatterns = [
     path('create_customer', views.create_customer, name='create_customer'),
-    path('create_grn', views.create_grn, name='create_grn'),
-    path('display_grn', views.display_grn, name='display_grn'),
     path('create_supplier', views.create_supplier, name='create_supplier'),
     path('display_items', views.display_items, name='display_items'),
     path('display_customers', views.display_customers, name='display_customers'),
@@ -23,6 +21,8 @@ urlpatterns = [
     path('display_purchase', views.display_purchase, name='display_purchase'),
     path('display_supplier_profile/<str:supplier_name>', views.display_supplier_profile, name='display_supplier_profile'),
     path('create_purchase', views.create_purchase, name='create_purchase'),
+    path('create_grn', views.create_grn, name='create_grn'),
+    path('display_grn', views.display_grn, name='display_grn'),
     path('create_shipping', views.create_shipping, name='create_shipping'),
     path('order_approval', views.order_approval, name='order_approval'),
     path('purchase_approval', views.purchase_approval, name='purchase_approval'),
@@ -39,6 +39,7 @@ urlpatterns = [
     path('indexs', views.index_home, name='indexs'),
     path('create_order_items', views.create_order_items, name='create_order_items'),
     path('create_purchase_items', views.create_purchase_items, name='create_purchase_items'),
+    path('create_grn_items', views.create_grn_items, name='create_grn_items'),
     path('create_invoice_items', views.create_invoice_items, name='create_invoice_items'),
     path('display_single_order/<str:order_no>', views.display_single_order, name='display_single_order'),
     path('display_single_purchase/<str:purchase_no>', views.display_single_purchase, name='display_single_purchase'),
@@ -51,6 +52,7 @@ urlpatterns = [
     path('completed_orders', views.completed_orders, name='completed_orders'),
     path('get_item_data/<str:item_id>/', get_item_data, name='get_item_data'),
     path('edit_order_only', views.edit_order_only, name='edit_order_only'),
+    
 ]
 
 # urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
