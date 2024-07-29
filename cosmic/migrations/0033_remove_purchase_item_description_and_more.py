@@ -14,9 +14,9 @@ class Migration(migrations.Migration):
             model_name='purchase_item',
             name='description',
         ),
-        # migrations.AddField(
-        #     model_name='cosmic_purchase',
-        #     name='conditions',
-        #     field=models.TextField(blank=True, null=True),
-        # ),
+        migrations.AddField(
+            model_name='cosmic_purchase',
+            name='conditions',
+            field=models.TextField(blank=True, null=True),
+        ),
     ]

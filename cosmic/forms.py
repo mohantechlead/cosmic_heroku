@@ -248,3 +248,20 @@ class CosmicExpenseForm(forms.ModelForm):
        
         model = cosmic_expense
         fields = ['amount','purpose','reference','date','serial_no','attachement']
+
+class CosmicGRNForm(forms.ModelForm):
+    class Meta:
+
+        model = cosmic_grn
+        fields=['GRN_no','grn_date','recieved_from','transporter_name','truck_no','store_name','store_keeper']
+
+class CosmicGRNItemForm(forms.ModelForm):
+    class Meta:
+        model = cosmic_grnitem
+        fields = ['item_name', 'quantity']
+
+class DeliveryForm(forms.ModelForm):
+    delivery_number = forms.IntegerField(required=True)
+    class Meta:
+        model = cosmic_delivery
+        fields = ['delivery_number','delivery_date', 'delivery_quantity','truck_number','driver_name','recipient_name','delivery_comment']
