@@ -1849,7 +1849,7 @@ def display_grn(request):
         grns_data = []
         for grn in grns:
             # Fetch all order items related to each cosmic order
-            grns_items = cosmic_grnitem.objects.filter(GRN_no=cosmic_grn.GRN_no)
+            grns_items = cosmic_grnitem.objects.filter(GRN_no=grn.GRN_no)
 
             # Create a dictionary containing order details and items
             grn_data = {
@@ -1857,13 +1857,14 @@ def display_grn(request):
                 'date': grn.grn_date,  # Assuming 'date' is a field in CosmicOrder
                 'grns_items': grns_items,  # Assuming a related name 'order_items' on CosmicOrder pointing to OrderItem
                 'total_quantity': grn.total_quantity,  # Assuming 'total_quantity' is a field in CosmicOrder
-                'store_no': grn.store_name,  # Assuming 'customer_name' is a field in CosmicOrder
+                'store_name': grn.store_name,  # Assuming 'customer_name' is a field in CosmicOrder
                 'plate_no': grn.truck_no,  # Assuming 'status' is a field in CosmicOrder
             }
             grns_data.append(grn_data)
 
         context = {
             'my_grn': grns_data,
+            
         }
         return render(request, 'display_grn.html',context)
 

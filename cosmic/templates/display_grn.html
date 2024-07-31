@@ -24,15 +24,17 @@
                       <td style="text-align:left"><a href="/cosmic/display_single_order/{{order.order_no}}" >{{ grn.GRN_no }}</a></td>
                       <td>{{ grn.date }}</td>
                       <td>
-                        {% for item in grn.grn_items.all %}
+                        {% for item in grn.grns_items.all %}
                             {{ item.item_name }}
                             {% if not forloop.last %}<br>{% endif %}
                         {% endfor %}
                     </td>
-                    <td>{% for item in grn.grn_items.all %}
+                    <td>
+                      {% for item in grn.grns_items.all %}
                       {{ item.quantity }}
                       {% if not forloop.last %}<br>{% endif %}
-                  {% endfor %}</td>
+                  {% endfor %}
+                </td>
                                          
                       
                       <td>{{ grn.plate_no }}</td>
