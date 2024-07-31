@@ -10,27 +10,27 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RemoveField(
-            model_name='cosmic_expense',
-            name='id',
-        ),
-        migrations.RemoveField(
-            model_name='cosmic_income',
-            name='id',
-        ),
+        # migrations.RemoveField(
+        #     model_name='cosmic_expense',
+        #     name='id',
+        # ),
+        # migrations.RemoveField(
+        #     model_name='cosmic_income',
+        #     name='id',
+        # ),
         # migrations.AddField(
         #     model_name='cosmic_purchase',
         #     name='conditions',
         #     field=models.TextField(blank=True, null=True),
         # ),
-        migrations.AlterField(
-            model_name='cosmic_expense',
-            name='serial_no',
-            field=models.TextField(primary_key=True, serialize=False),
-        ),
-        migrations.AlterField(
-            model_name='cosmic_income',
-            name='serial_no',
-            field=models.TextField(primary_key=True, serialize=False),
-        ),
+        # migrations.AlterField(
+        #     model_name='cosmic_expense',
+        #     name='serial_no',
+        #     field=models.TextField(primary_key=True, serialize=False),
+        # ),
+        # migrations.AlterField(
+        #     model_name='cosmic_income',
+        #     name='serial_no',
+        #     field=models.TextField(primary_key=True, serialize=False),
+        # ),
     ]

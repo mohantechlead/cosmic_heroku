@@ -141,24 +141,6 @@ class item_codes(models.Model):
         return self.item_name
    # item_id = models.TextField(primary_key = True)
 
-class cosmic_income(models.Model):
-    serial_no = models.TextField(blank=False, null=False, primary_key=True)
-    amount = models.FloatField(blank=True, null=True)
-    purpose = models.TextField(blank=True, null=True)
-    reference = models.TextField(blank=True, null=True)
-    payment_type = models.TextField(blank=True, null=True)
-    details = models.TextField(blank=True, null=True)
-    date = models.DateField(blank=False)
-
-
-class cosmic_expense(models.Model):
-   serial_no = models.TextField(blank=False, null=False, primary_key=True)
-   date = models.DateField(blank=False)
-   amount = models.FloatField(blank=True, null=True)
-   purpose = models.TextField(blank=True, null=True)
-   reference = models.TextField(blank=True, null=True)
-   attachement = models.FileField(blank=True, null=True, upload_to="media/")
-
 class cosmic_grn(models.Model):
     GRN_no = models.TextField(primary_key=True)
     grn_date = models.DateField(blank=True, null=True)
