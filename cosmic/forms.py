@@ -231,24 +231,6 @@ trialFormset = inlineformset_factory(
     cosmic_order, order_item, form=OrderItemForm, extra=1, can_delete=True, can_delete_extra = True
 )   
 
-class CosmicIncomeForm(forms.ModelForm):
-
-    serial_no = forms.CharField(widget=forms.TextInput(attrs={'class': 'serial_no form-control'}))
-    
-    class Meta:
-       
-        model = cosmic_income
-        fields = ['amount','purpose','reference','payment_type','details','date','serial_no']
-
-class CosmicExpenseForm(forms.ModelForm):
-
-    # attachement = forms.FileField()
-
-    class Meta:
-       
-        model = cosmic_expense
-        fields = ['amount','purpose','reference','date','serial_no','attachement']
-
 class CosmicGRNForm(forms.ModelForm):
     class Meta:
 

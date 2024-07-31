@@ -21,11 +21,11 @@ class Migration(migrations.Migration):
             name='remaining',
             field=models.TextField(blank=True, null=True),
         ),
-        migrations.AddField(
-            model_name='item_codes',
-            name='new_id',
-            field=models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False),
-        ),
+        # migrations.AddField(
+        #     model_name='item_codes',
+        #     name='new_id',
+        #     field=models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False),
+        # ),
         migrations.AlterField(
             model_name='purchase_item',
             name='purchase_no',

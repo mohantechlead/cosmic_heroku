@@ -1711,17 +1711,21 @@ def update_shipping(request):
         formset = invoice_item_formset(request.POST)
         if formset.is_valid():
             print("valid")
-            instances = formset.save(commit=False)
+            # instances = formset.save(commit=False)
             final_price = 0
-            for instance in instances:
-                final_price += instance.before_vat
-                
+            total_bags = 0
+            for instance in formset:
+                print("here")
+                total_bags += int(instance.cleaned_data['bags'])
+                final_price += float(instance.cleaned_data['before_vat'])
                 print("Field names:", instance.__dict__.keys())
                 instance.invoice_num = shipping_instance
                 print(final_price,"price")
                 print(instance,"instance")
+                
                 instance.save()
             shipping_instance.final_price = final_price
+            shipping_instance.total_bags = total_bags
             shipping_instance.save()
             # Redirect to another page after saving all instances
             return render(request, "create_order.html")

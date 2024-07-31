@@ -87,7 +87,7 @@ DATABASES = {
    # },
     'default': {
        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'trial',
+        'NAME': 'cosmic',
        'USER': 'postgres',
        'PASSWORD': 'mohanPLC',
        'HOST': '127.0.0.1', 
