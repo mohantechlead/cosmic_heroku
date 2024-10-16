@@ -27,7 +27,7 @@
                 </ul>
             </div>
             {% endif %}
-            <form method="post" action="{% url 'create_shipping' %}" id="form2">
+            <form method="post" action="{% url 'create_shipping' %}" id="form1">
                 {% csrf_token %}
                 <div class="row">
                     <div class="col-sm-5">
@@ -175,7 +175,7 @@
      {% endif %}
  
  
-     <form method="post" action="{% url 'create_invoice_items' %}" id="form3">
+     <form method="post" action="{% url 'create_invoice_items' %}" id="form2">
          {% csrf_token %}
  
          {{ formset.management_form }}
@@ -249,7 +249,6 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        //const radioButtons = document.querySelectorAll('input[type="radio"]');
         const radioButtons = document.querySelectorAll('.measurement_type');
         const submitButton = document.querySelector('#submits');
         const submitsButton = document.querySelector('#submitss');
@@ -257,78 +256,71 @@
         const priceFields = document.querySelectorAll('.price');
         const totalPriceField = $('#total-price');
         const totalVatField = $('#total-vat');
-        var orderNoValue = document.querySelector('input[name="order_no"]').value;
+        const orderNoValue = document.querySelector('input[name="order_no"]').value;
         const radioButtons2 = document.querySelectorAll('.payment_type');
-        const totalNewForms = document.getElementById('id_items-TOTAL_FORMS')
-        console.log(totalNewForms)
-        console.log("try")
+        const totalNewForms = document.getElementById('id_items-TOTAL_FORMS');
         const quantityFields = $('.quantity');
-        //const discount_checkbox = document.getElementById("discountCheckbox");
-        
-        //var discount = false
+
+        var univ_total = 0;
+        var univ_vat = 0;
 
         submitsButton.addEventListener('click', function (event) {
             event.preventDefault();
             calculateTotalPrice();
-            console.log("calc")
         });
+
         addMoreBtn.addEventListener('click', add_new_form);
-        
-        var univ_total = 0
-        var univ_vat = 0
+
+        const VAT_RATE = 0.15;
+
         function calculateTotalPrice() {
-        var total = 0
-        var total_vat = 0
-        var originalTotal = 0;
-        var originalVat = 0;
+            var total = 0;
+            var total_vat = 0;
+            var originalTotal = 0;
+            var originalVat = 0;
 
-        const formsets = $('.item-list');
-        const total_price_fields = document.querySelectorAll('.total_price');
-        const total_vat_fields = document.querySelectorAll('.before_vat');
-        //const discountApplied = discount_checkbox.checked;
-        
-        $('.item-list').each(function() {
+            const formsets = $('.item-list');
+            const total_price_fields = document.querySelectorAll('.total_price');
+            const total_vat_fields = document.querySelectorAll('.before_vat');
             
-        
-            // Within each formset, select the 'total_price' fields
-            const totalFields = $(this).find('.total_price');
-            const vatFields = $(this).find('.before_vat');
-            totalFields.each(function() {
-            const price = parseFloat($(this).val()) || 0;
-         
-            total += price;
-            originalTotal += price; 
-            });
-            vatFields.each(function() {
-            const vat_price = parseFloat($(this).val()) || 0;
-            total_vat += vat_price;
-            originalVat += vat_price;
-          
-            });
-            
-            console.log(total)
-           
-            // Update the total for this formset
-            univ_total = total;
-            univ_vat = total_vat;
-            totalPriceField.val(total.toFixed(2));  // Update the 'value' of the field
-            totalPriceField.text('Total Price: $' + total.toFixed(2)); 
-            totalVatField.val(total_vat.toFixed(2));  // Update the 'value' of the field
-            totalVatField.text('Total Price: $' + total_vat.toFixed(2));  // Update the displayed text
-        });
-       
-            }
+            $('.item-list').each(function () {
+                const totalFields = $(this).find('.total_price');
+                const vatFields = $(this).find('.before_vat');
+                
+                totalFields.each(function () {
+                    const price = parseFloat($(this).val()) || 0;
+                    total += price;
+                    originalTotal += price; 
+                });
 
-    // Call the calculation function when the page loads
-    calculateTotalPrice();
+                vatFields.each(function () {
+                    const vat_price = parseFloat($(this).val()) || 0;
+                    total_vat += vat_price;
+                    originalVat += vat_price;
+                });
 
+                // Update totals
+                univ_total = total;
+                univ_vat = total_vat;
+
+                totalPriceField.val(total.toFixed(2));  
+                totalPriceField.text('Total Price: $' + total.toFixed(2)); 
+
+                totalVatField.val(total_vat.toFixed(2));  
+                totalVatField.text('Total VAT: $' + total_vat.toFixed(2));  
+            });
+        }
+
+        calculateTotalPrice(); // Call on page load
 
         radioButtons.forEach(button => {
             button.addEventListener('change', function () {
                 // Hide all input elements
-                hideAllInputs();
-                console.log("trys")
-                // Show the input element corresponding to the selected radio button
+                document.querySelectorAll('.input-field').forEach(input => {
+                    input.style.display = 'none';
+                });
+
+                // Show the relevant input element
                 const inputId = 'input_' + this.value;
                 const inputElement = document.getElementById(inputId);
                 if (inputElement) {
@@ -336,68 +328,60 @@
                 }
             });
         });
-        
+
         submitButton.addEventListener('click', function (event) {
-            event.preventDefault(); // Prevent the default form submission
+            event.preventDefault(); // Prevent default form submission
 
             // Serialize form data
+            const form1 = document.getElementById('form1');
+            const form2 = document.getElementById('form2');
+            const formData1 = new FormData(form1);
             const formData2 = new FormData(form2);
-            const formData3 = new FormData(form3);
-            //console.log(univ_total,"tots")
-            //const freightPrice = formData1.get('freight1');
+
             const prNoValue = orderNoValue;
-            const inv_no = formData2.get('invoice_num')
-          
-            const amount = 1
-           
-            console.log(prNoValue)
-            console.log(inv_no)
-            formData2.append('order_no', prNoValue)
-            formData3.append('order_no', prNoValue)
-            formData3.append('invoice_num', inv_no)
-            // Use fetch to submit both forms asynchronously
-            fetch(form2.action, {
-            method: 'POST',
-            body: formData2
-        })
-   
-.then(response => {
-    if (response && !response.ok) {
-        return response.json().then(data => {
-            console.log('Form 2 errors:', data.form_errors);
-            // Display the errors in the UI for form 2
+            const inv_no = formData1.get('invoice_num');
+
+            formData1.append('order_no', prNoValue);
+            formData2.append('order_no', prNoValue);
+            formData2.append('invoice_num', inv_no);
+
+            // Submit form1 and form2 asynchronously
+            fetch(form1.action, {
+                method: 'POST',
+                body: formData1
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(data => {
+                        console.log('Form 1 errors:', data.form_errors);
+                    });
+                } else {
+                    return fetch(form2.action, {
+                        method: 'POST',
+                        body: formData2
+                    });
+                }
+            })
+            .then(response => {
+                if (response && !response.ok) {
+                    return response.json().then(data => {
+                        console.log('Form 2 errors:', data.form_errors);
+                    });
+                } else {
+                    // Reset forms and reload the page after successfully submitting both forms
+                    alert("Shipping Details Added!");
+                    form1.reset();
+                    form2.reset();
+                    window.location.reload();     
+                }
+            });
         });
-    } else {
-        return fetch(form3.action, {
-            method: 'POST',
-            body: formData3
-        });
-    }
-})
-.then(response => {
-    if (response && !response.ok) {
-        return response.json().then(data => {
-            console.log('Form 3 errors:', data.form_errors);
-            // Display the errors in the UI for form 3
-        });
-    } else {
-        // Reset forms and reload the page after successfully submitting the third form
-        document.getElementById('form1').reset();
-        document.getElementById('form2').reset();
-        window.location.reload();
-        alert("Shipping Details Added!")
-    }
-})
-.catch(error => {
-    // console.error('Error submitting forms:', error);
-    // Handle any general errors during form submission
-});
-        });
+
         function updateTotalPrice(form) {
-            var quantity = parseFloat(form.find('.quantity').val());
-            var price = parseFloat(form.find('.price').val());
+            var quantity = parseFloat(form.find('.quantity').val()) || 0;
+            var price = parseFloat(form.find('.price').val()) || 0;
             var total = quantity * price || 0;
-            var total_price = total + (total * 0.15)
+            var total_price = total + (total * VAT_RATE);
             form.find('.before_vat').val(total.toFixed(2));
             form.find('.total_price').val(total_price.toFixed(2));
         }
@@ -407,33 +391,36 @@
             updateTotalPrice(form);
         });
 
-        // Apply initial calculation for existing forms
         $('.item-list').each(function () {
             var form = $(this);
             updateTotalPrice(form);
         });
+
         function add_new_form(args) {
-            // Your code to add a new form here
-            const currentForms = document.getElementsByClassName('item-list')
-            let currentFormsCount = currentForms.length + 1
-            console.log(currentForms.length)
-            console.log(totalNewForms);
-            const copyFormTarget = document.getElementById('form-lists')
+            const currentForms = document.getElementsByClassName('item-list');
+            let currentFormsCount = currentForms.length;
+            
+            const copyFormTarget = document.getElementById('form-lists');
             const copyEmptyForm = document.getElementById('empty-form').cloneNode(true);
-            copyEmptyForm.setAttribute('class', 'item-list form-group col-md-5 text-dark')
-            copyEmptyForm.setAttribute('id', `form-${currentFormsCount}`)
+            copyEmptyForm.setAttribute('class', 'item-list form-group col-md-5 text-dark');
+            copyEmptyForm.setAttribute('id', `form-${currentFormsCount}`);
+            
             // Clear input values in the cloned form
-            const regex = new RegExp('__prefix__', 'g')
+            const regex = new RegExp('__prefix__', 'g');
             copyEmptyForm.querySelectorAll('input').forEach(function (input) {
                 input.value = '';
             });
-            copyEmptyForm.innerHTML = copyEmptyForm.innerHTML.replace(regex, currentFormsCount)
-            // Append the cloned form to the form list
+            copyEmptyForm.innerHTML = copyEmptyForm.innerHTML.replace(regex, currentFormsCount);
+
+            // Update totalNewForms value
             totalNewForms.value = currentFormsCount + 1;
+
+            // Append the cloned form to the form list
             copyFormTarget.appendChild(copyEmptyForm);
         }
     });
 </script>
+
 
 
 {% endblock %}
