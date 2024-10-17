@@ -31,6 +31,7 @@ class cosmic_order(models.Model):
     date = models.DateField(blank=False)
     freight = models.TextField(blank=True, null=True)
     freight_price = models.FloatField(blank=True, null=True)
+    insurance_price = models.FloatField(blank=True, null=True)
     payment_type = models.TextField(blank=True, null=True)
     measurement_type = models.TextField(blank=True, null=True)
     transportation = models.TextField(blank=True, null=True)

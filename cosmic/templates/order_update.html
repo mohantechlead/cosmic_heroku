@@ -146,16 +146,7 @@
                                     
                                 </div>
         
-                            </span>
-                            <!-- <span class="form-group">
-                                <label class="control-label col-sm-8">Total Price<span style="color: rgb(187, 17, 17);">*</span></label>
-                                <div class="col-sm-11">
-                                    <input type="text" class="form-control" name="PR_before_vat" value="{{cosmic_order_instance.PR_before_vat}}">
-                                    
-                                </div>
-        
-                            </span> -->
-        
+                            </span>     
         
                         </div>
         
@@ -415,13 +406,14 @@
         $(document).on('input', '.item-list .quantity, .item-list .price', function () {
             var form = $(this).closest('.item-list');
             updateTotalPrice(form);
+            fetchCodes(form);
         });
 
         // Apply initial calculation for existing forms
         $('.item-list').each(function () {
             var form = $(this);
             updateTotalPrice(form);
-        });4
+        });
         radioButtons.forEach(button => {
             button.addEventListener('change', function () {
                 // Hide all input elements
@@ -435,6 +427,45 @@
                 }
             });
         });
+
+        function fetchCodes(form){
+        
+        dropdowns.forEach(function(dropdown) {
+            
+            dropdown.addEventListener("change", function() {
+                var form = $(this).closest('.item-list');
+                //updateCode(form);
+                const formsets = $('.item-list');
+                const itemId = dropdown.value;
+                const codes = document.querySelectorAll('.hs_code');
+                console.log(itemId, "id");
+                $('.item-list').each(function() {
+                    // Within each formset, select the 'total_price' fields
+                    const itemId = $(this).find('.item_name');
+                    const code = $(this).find('.hs_codes');
+                    
+                    console.log(itemId, "id2");
+                    itemId.each(function() {
+                        const name = $(this).val();
+                        console.log(name, "name");
+                        // Make AJAX request to Django view
+                        fetch(`get_item_data/${name}/`)
+                            .then(response => response.json())
+                            .then(data => {
+                                console.log(data.code, "code");
+                                // Update corresponding output div with fetched data
+                                code.val(data.code); 
+                                 
+                            })
+                            .catch(error => console.error('Error:', error));
+                    });
+                    
+                    const codeInput = $(this).find('.hs_codes');
+                    //codeInput.val("is");
+                });
+            });
+        });
+                };
         
         
         submitButton.addEventListener('click', function (event) {

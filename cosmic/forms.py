@@ -21,7 +21,6 @@ class CustomerForm(forms.ModelForm):
         fields = ['customer_name','customer_address','email','phone_number','contact_person','comments']
 
 class SupplierForm(forms.ModelForm):
-    #phone_number = 
     phone_number = forms.CharField(widget=forms.TextInput(attrs={'class': 'phone_number form-control' }))
     supplier_address = forms.CharField(widget=forms.TextInput(attrs={'class': 'customer_address form-control'}))
 
@@ -45,7 +44,7 @@ class CosmicOrderForm(forms.ModelForm):
     class Meta:
    
         model = cosmic_order
-        fields = ['freight_price','customer_name','supplier_name','order_no','date','payment_type','measurement_type','approved_by','PR_before_vat','total_quantity','transportation','shipment_type','freight','ref_no','notify_party','country_of_origin','final_destination','port_of_discharge','port_of_loading','notify_party2','consignee']
+        fields = ['freight_price','insurance_price','customer_name','supplier_name','order_no','date','payment_type','measurement_type','approved_by','PR_before_vat','total_quantity','transportation','shipment_type','freight','ref_no','notify_party','country_of_origin','final_destination','port_of_discharge','port_of_loading','notify_party2','consignee']
         
 class OrderItemForm(forms.ModelForm):
    
@@ -64,7 +63,7 @@ class OrderItemForm(forms.ModelForm):
         widget=forms.Select(attrs={'class': 'item_name form-control'}),
         to_field_name='item_name'
     )
-    hs_code = forms.CharField(label='HS CODE', required=False, widget=forms.TextInput(attrs={'class': 'hs_codes form-control'}))
+    hs_code = forms.CharField(label='HS CODE', required=False, widget=forms.TextInput(attrs={'readonly': 'readonly','class': 'hs_codes form-control'}))
     
     
     class Meta:
@@ -89,14 +88,13 @@ class PurchaseItemForm(forms.ModelForm):
     measurement = forms.CharField(widget=forms.TextInput(attrs={'class': 'measurement form-control'}), required=False)
     quantity = forms.FloatField(widget=forms.TextInput(attrs={'class': 'quantity form-control' }))
     price = forms.DecimalField(widget=forms.TextInput(attrs={'class': 'price form-control'}))
-    
-        
-    
+    hs_code = forms.CharField(label='HS CODE', required=False, widget=forms.TextInput(attrs={'readonly': 'readonly','class': 'hs_codes form-control'}))
+
     
     class Meta:
    
         model = purchase_item
-        fields = [ 'item_name','price','quantity','before_vat','measurement']
+        fields = [ 'item_name','hs_code','price','quantity','before_vat','measurement']
         
 class CosmicPurchaseForm(forms.ModelForm):
     
