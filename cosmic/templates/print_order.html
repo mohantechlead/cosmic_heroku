@@ -16,9 +16,7 @@
                 {%else%}
                 <h4 style="margin-left: 62%; margin-top: 20px; font-size: 24px;">Purchase Order</h4>
                 {%endif%} </div>
-            
-    
-        
+                    
     </div>
     <div class="table-responsive " style="text-align: center;">
         <table class="table table-nowrap mb-0" style="margin-bottom: 0;margin-left: 0;">
@@ -154,7 +152,6 @@
                         </div>
                     </th>
 
-
                     {% if my_order.freight_amount %}
 
                     <th scope="row" colspan="4" class="border-0 text-end">
@@ -164,8 +161,6 @@
                         <p id="shipping_price">${{my_order.freight_amount}}</p>
                     </td>
 
-
-<!-- end tr -->
                 <tr>
                     <th scope="row" colspan="4" class="text-end">Sub Total</th>
                     <td class="text-end" id="total_price">${{my_order.PR_total_price|add:my_order.freight_amount }}</td>
@@ -201,7 +196,6 @@
                 </thead><!-- end thead -->
                 <tbody>
 
-
                     {% if pr_items %}
                     {% for delivery in pr_items %}
                     <tr>
@@ -236,34 +230,31 @@
                         </td>
                     </tr>
 
-                    <!-- end tr -->
+                    {% endif %}
 
+                    {% if my_order.insurance_price %}
+                    <tr>
+                        <th scope="row" colspan="4" class="border-0 text-end" style="margin: 0;padding: 0;">
+                            Insurance :</th>
+
+                        <td class="border-0 text-end" style="margin: 0;padding: 0;">
+                            <p id="shipping_price" style="color: black;">${{my_order.insurance_price}}</p>
+                        </td>
+                    </tr>
+                
+                    {% endif %}
+
+                    </tr>
+                    
                     <tr style="margin: 0;line-height: 1;padding: 0;">
                         <th scope="row" colspan="1" class="text-end" style="margin: 0;line-height: 1;padding: 0;">Total
                         </th>
                         <td colspan="3" style="margin: 0;padding: 0;">Amount in Words: USD {{num}} </td>
                         <td class="text-end" id="total_price" style="margin: 0;padding: 0;">
-                            ${{number|intcomma }}</td>
+                            ${{number|intcomma}} </td>
                     </tr>
 
-                    {% else %}
-
-                    <!-- end tr -->
-                    <tr style="margin: 0;line-height: 1;padding: 0;">
-                        <th scope="row" colspan="1" class="text-end" style="margin: 0;line-height: 1;padding: 0;">Total
-                        </th>
-                        <td colspan="3" >Amount in Words: USD {{num}} </td>
-                        {% if my_order.order_no %}
-                        <td class="text-end" id="total_price">
-                            ${{my_order.PR_before_vat|intcomma }}</td>
-                        {%else%}
-                        <td class="text-end" id="total_price">${{my_order.before_vat|intcomma }}</td>
-                        {%endif%}
-                    </tr>
-                    {% endif %}
-
-                    </tr>
-                    <!-- end tr -->
+                    
                 </tbody><!-- end tbody -->
             </table><!-- end table -->
         </div><!-- end table responsive -->
@@ -327,17 +318,12 @@
             const totalPrice = document.getElementById('total_price')
             const shippingPriceElement = document.getElementById('shipping_price');
             
-    
             var total_price = parseFloat(totalPrice.textContent);
             var shippingPrice = parseFloat(shippingPriceElement.textContent);
             console.log(shippingPrice)
             shippingPrice = shippingPrice.toString()
             var modifiedValue = shippingPrice.replace('$', '');
             console.log(modifiedValue)
-            
-    
-            
-    
         })
     
     </script>
