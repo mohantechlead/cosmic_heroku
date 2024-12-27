@@ -105,7 +105,7 @@ class CosmicPurchaseForm(forms.ModelForm):
     class Meta:
    
         model = cosmic_purchase
-        fields = ['freight_price','customer_name','supplier_name','purchase_no','date','payment_type','measurement_type','approved_by','before_vat','total_quantity','transportation','shipment_type','freight','ref_no','notify_party','country_of_origin','final_destination','port_of_discharge','port_of_loading','notify_party2','consignee','conditions']
+        fields = ['freight_price','insurance','customer_name','supplier_name','purchase_no','date','payment_type','measurement_type','approved_by','before_vat','total_quantity','transportation','shipment_type','freight','ref_no','notify_party','country_of_origin','final_destination','port_of_discharge','port_of_loading','notify_party2','consignee','conditions']
         
 class ShippingForm(forms.ModelForm):
     

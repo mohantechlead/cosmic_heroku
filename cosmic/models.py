@@ -74,6 +74,7 @@ class cosmic_purchase(models.Model):
     final_destination = models.TextField(blank=True, null=True)
     country_of_origin = models.TextField(blank=False, null=True)
     conditions = models.TextField(blank=True, null=True)
+    insurance = models.FloatField(blank=True, null=True)
 
 class shipping_info(models.Model):
     invoice_date = models.DateField(blank=True, null=True)

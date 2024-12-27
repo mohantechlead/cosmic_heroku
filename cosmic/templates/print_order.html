@@ -226,7 +226,43 @@
                     </tr>
                     {% endfor %}
                     {% endif %}
-                    {% if my_order.freight_price %}
+                    
+                    {% if my_order.insurance and my_order.freight_price %}
+
+
+                    {% comment %} {% if %} {% endcomment %}
+                    <tr>
+                        <th scope="row" colspan="4" class="border-0 text-end" style="margin: 0;padding: 0;">
+                            Freight :</th>
+
+                        <td class="border-0 text-end" style="margin: 0;padding: 0;">
+                            <p id="shipping_price" style="color: black;">${{my_order.freight_price}}</p>
+                        </td>
+                    </tr>
+
+
+                    <tr>
+                        <th scope="row" colspan="4" class="border-0 text-end" style="margin: 0;padding: 0;">
+                            Insurance :</th>
+
+                        <td class="border-0 text-end" style="margin: 0;padding: 0;">
+                            <p id="shipping_price" style="color: black;">${{my_order.insurance}}</p>
+                        </td>
+                    </tr>
+
+                    <!-- end tr -->
+
+                    <tr style="margin: 0;line-height: 1;padding: 0;">
+                        <th scope="row" colspan="1" class="text-end" style="margin: 0;line-height: 1;padding: 0;">Total
+                        </th>
+                        <td colspan="3" style="margin: 0;padding: 0;">Amount in Words: USD {{num}} </td>
+                        <td class="text-end" id="total_price" style="margin: 0;padding: 0;">
+                            ${{number|intcomma }}</td>
+                    </tr>
+
+                    {% comment %} {% endif %} {% endcomment %}
+
+                    {% elif my_order.freight_price %}
                     <tr>
                         <th scope="row" colspan="4" class="border-0 text-end" style="margin: 0;padding: 0;">
                             Freight :</th>
@@ -245,6 +281,7 @@
                         <td class="text-end" id="total_price" style="margin: 0;padding: 0;">
                             ${{number|intcomma }}</td>
                     </tr>
+
 
                     {% else %}
 
