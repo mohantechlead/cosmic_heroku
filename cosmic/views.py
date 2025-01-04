@@ -1045,12 +1045,16 @@ def print_order(request):
             number = float(orders.before_vat)
             print(orders.before_vat)
 
-        if orders.freight_price and orders.insurance:
-            number += float(orders.insurance) + float(orders.freight_price)
-        elif orders.freight_price:
+        # if orders.freight_price and orders.insurance:
+        #     number += float(orders.insurance) + float(orders.freight_price)
+        # elif orders.freight_price:
+        #     number += float(orders.freight_price)
+        # elif orders.insurance:
+        #     number += float(orders.insurance)
+        
+        if orders.freight_price:
             number += float(orders.freight_price)
-        elif orders.insurance:
-            number += float(orders.insurance)
+        
         #print(shipping.freight_amount,"fr")
         dicts = {1:"TEN",2:"TWENTY",3:"THIRTY",4:"FORTY",5:"FIFTY",6:"SIXTY",7:"SEVENTY",8:"EIGHTY",9:"NINTY"}
         
