@@ -1223,6 +1223,7 @@ def commercial_invoice(request):
         inv_no = request.GET['invoice_num']
         try:
             orders = cosmic_order.objects.get(order_no=pr_no)
+            cosm_order = shipping_info.objects.get(order_no = pr_no, invoice_num=inv_no)
             pr_items = order_item.objects.all()
             pr_items = pr_items.filter(order_no=pr_no)
         except cosmic_order.DoesNotExist:
@@ -1257,11 +1258,11 @@ def commercial_invoice(request):
             number = shipping.final_price
             print(shipping.final_price)
         dicts = {1:"TEN",2:"TWENTY",3:"THIRTY",4:"FORTY",5:"FIFTY",6:"SIXTY",7:"SEVENTY",8:"EIGHTY",9:"NINTY"}
-        if shipping:
-            if orders.freight_price:
-                print(number,orders.freight_price,"try")
-                number += float(orders.freight_price)
-        print(number)
+        # if shipping:
+        #     if orders.freight_price:
+        #         print(number,orders.freight_price,"try")
+        #         number += float(orders.freight_price)
+        # print(number)
 
         whole_part, decimal_part = str(number).split('.')
         number_in_words = num2words(whole_part)
@@ -1284,7 +1285,8 @@ def commercial_invoice(request):
                         'shipping': shipping,
                         'num': num,
                         'number':number,
-                        'shipping_items': shipping_items
+                        'shipping_items': shipping_items,
+                        'cos_order':cosm_order
                     }
             return render(request, 'commercial_invoice.html', context)
         context = {
@@ -1294,6 +1296,7 @@ def commercial_invoice(request):
                         'num': num,
                         'shipping_items': shipping_items,
                         'number':number,
+                        'cos_order':cosm_order
                     }
     return render(request, 'commercial_invoice.html', context)
 
