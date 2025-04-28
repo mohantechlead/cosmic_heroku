@@ -219,6 +219,13 @@
                                             <label for="lc-sight">Irrevocable LC at Sight</label>
                                         </div>
                                         <div>
+
+                                            <input type="radio" name="payment_type" value="Open Credit" id="open-credit" {% if cosmic_order_instance.payment_type == 'Open Credit'%} checked {% endif%}>
+                                            <label for="open-credit">Open Credit</label>
+
+</div>
+
+<div>
                                             <input type="radio" name="payment_type" value="Cash Against Doc" id="cash-doc" {% if cosmic_order_instance.payment_type == 'Cash Against Doc'%} checked {% endif%}>
                                             <label for="cash-doc">Cash Against Doc</label>
                                         </div>
