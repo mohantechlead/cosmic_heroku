@@ -241,7 +241,7 @@
                         {%else%}
                         <td>{{my_order.measurement_type}}</td>
                         {%endif%}
-                        <td>{{delivery.net_weight|floatformat:3}} {{delivery.measurement}}</td>
+                        <td>{{delivery.quantity|floatformat:3}} {{delivery.measurement}}</td>
                         <td> {{delivery.price|floatformat:3}} $</td>
                         <td>{{delivery.before_vat|floatformat:3}}</td>
                         <!-- <td> {{delivery.before_vat}} </td> -->
