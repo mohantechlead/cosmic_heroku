@@ -1,29 +1,20 @@
 {% extends 'cosmic_base.html' %}
-
+{% block body_class %}print-document{% endblock %}
 {% block content %}
 <div class="form-group ">
-    
-    <div class="table-responsive ">
+    <div class="invoice-header" style="display: flex;">
+        <div class="text-muted">
+            <img src="../static/logo.jpg" alt="" style="width: 150px; border-radius: 50%; margin-left: 380px;">
+            <h3 style="margin-left: 280px;">Cosmic Connection FZE</h3>
+            <p style="margin-left: 350px; text-align: center;">Free Zone, Djibouti
+                <br>Email: tanirm@gmail.com <br>TEL.+253-77 81 55 70
+            </p>
+            <h4 style="margin-left: 300px; margin-top: 50px; font-size: 24px;">Truckway Bill</h4>
+        </div>
+    </div>
+    <div class="table-responsive">
         <table class="table table-nowrap mb-0">
             <thead>
-                <tr style="margin-left: 100px;">
-                    <div style="display: flex;">
-        
-        
-                        <div class="text-muted">
-                            <img src="../static/logo.jpg" alt="" style="width: 150px; border-radius: 50%; margin-left: 380px;">
-                            <h3 style="margin-left: 280px;">Cosmic Connection FZE</h3>
-                            <p style="margin-left: 350px; text-align: center;">Free Zone, Djibouti
-                                <br>Email: tanirm@gmail.com <br>TEL.+253-77 81 55 70
-                            </p>
-            
-                            <h4 style="margin-left: 300px; margin-top: 50px; font-size: 24px;">Truckway Bill</h4>
-                        </div>
-                        
-                
-                    
-                </div>
-                </tr>
                 <tr>
                     <th style="width: 200px;">
                         <h4 class="text-muted text-sm-end font-size-15 mb-1">Shipper</h4>

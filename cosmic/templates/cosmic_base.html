@@ -42,6 +42,93 @@
                 display: none;
             }
         }
+    /* Print styles for invoice documents - hide nav/sidebar, scale & center for one page */
+    @media print {
+        @page {
+            size: A4;
+            margin: 8mm;
+        }
+        body.print-document #sidebar,
+        body.print-document .navbar,
+        body.print-document .navbar-light,
+        body.print-document #sidebarCollapse {
+            display: none !important;
+        }
+        body.print-document .wrapper {
+            display: block !important;
+        }
+        body.print-document #content {
+            margin: 0 !important;
+            padding: 4mm !important;
+            min-height: auto !important;
+            transform: scale(0.9);
+            transform-origin: top center;
+            width: 111%;
+            margin-left: -5.5% !important;
+        }
+        /* Center header block - logo, company name, address, document title */
+        body.print-document #content .invoice-header {
+            width: 100% !important;
+            justify-content: center !important;
+            display: flex !important;
+        }
+        body.print-document #content .invoice-header .text-muted,
+        body.print-document #content .invoice-header .text-muted h3,
+        body.print-document #content .invoice-header .text-muted h4,
+        body.print-document #content .invoice-header .text-muted p,
+        body.print-document #content .invoice-header h4 {
+            text-align: center !important;
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+        }
+        body.print-document #content .invoice-header .text-muted {
+            width: fit-content !important;
+        }
+        /* Logo - bigger and centered */
+        body.print-document #content img {
+            width: 110px !important;
+            height: 110px !important;
+            margin-left: auto !important;
+            margin-right: auto !important;
+            display: block !important;
+            border-radius: 50% !important;
+        }
+        /* Left-align body content */
+        body.print-document #content .form-group {
+            text-align: left !important;
+        }
+        body.print-document #content .form-group h3,
+        body.print-document #content .form-group h4,
+        body.print-document #content .form-group p {
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+            font-size: 13px !important;
+            line-height: 1.35 !important;
+            margin-top: 2mm !important;
+            margin-bottom: 2mm !important;
+        }
+        body.print-document #content .form-group h3 {
+            font-size: 20px !important;
+        }
+        body.print-document #content .form-group h4 {
+            font-size: 17px !important;
+        }
+        /* Table sizing - bigger */
+        body.print-document #content table {
+            font-size: 12px !important;
+        }
+        body.print-document #content th,
+        body.print-document #content td {
+            padding: 2.5mm 3.5mm !important;
+            font-size: 12px !important;
+        }
+        body.print-document #content .table-responsive {
+            margin-bottom: 2mm !important;
+        }
+        body.print-document #content .mb-4 {
+            margin-bottom: 2mm !important;
+        }
+    }
     .item-list {
         flex: 0 0 calc(50% - 10px); /* Set width for two elements with a 10px margin in between */
         margin-bottom: 10px; /* Add margin bottom to create space */
@@ -103,7 +190,7 @@ ul ul a {
     </style>
 </head>
 
-<body>
+<body class="{% block body_class %}{% endblock %}">
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
     
     <div class="wrapper" style="margin-top: 0%;">
