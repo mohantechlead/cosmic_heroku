@@ -1,50 +1,51 @@
 <!-- templates/admin/custom_report.html -->
 {% extends "cosmic_base.html" %}
 
+{% block body_class %}admin-page{% endblock %}
+
 {% block content %}
-{% if messages %}
-    <ul class="messages" style="color: red;">
-        {% for message in messages %}
-            <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-        {% endfor %}
-    </ul>
-{% endif %}
-<form method="post">
-    {% csrf_token %}
-    <div><h3 style="margin: 50px;">Purchase Approvals</h3></div>
-    <div>
-        <div class="col-sm-7" style="text-align: right;"> Approved By:</div>
-        <div class="col-sm-3">
-            <input type="text" name="approval" id="approval" class="form-control" placeholder="Approved By">
+<div class="admin-workspace">
+    <div class="admin-workspace-header">
+        <h2>Purchase Approvals</h2>
     </div>
-       </div>
-    <table class="table table-striped table-bordered" style="margin-top: 50px; margin-left: 30px;">
-        <thead>
-            <tr>
-                <th>Selects</th>
-                <th>Purchase ID</th>
-                <th>Status</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for order in pending_orders %}
-                <tr>
-                    <td><input type="checkbox" name="selected_orders" value="{{ order.purchase_no }}"></td> 
-                    <td><a href="#" class="order-link2" data-order-id="{{ order.purchase_no}}">{{ order.purchase_no }}</a></td>
-                    <td>{{ order.status }}</td>
-                    <td>
-                        <button type="submit" name="action" value="approve" class="btn btn-success">Approve</button>
-                        <button type="submit" name="action" value="reject" class="btn btn-danger">Reject</button>
-                    </td>
-                    
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-   
-    
-</form>
+    <div class="admin-workspace-body">
+        <form method="post">
+            {% csrf_token %}
+            <div class="admin-toolbar">
+                <label for="approval">Approved By</label>
+                <input type="text" name="approval" id="approval" class="form-control" placeholder="Enter approver name">
+            </div>
+
+            <div class="admin-table-wrap">
+                <table class="table table-striped table-bordered admin-table">
+                    <thead>
+                        <tr>
+                            <th>Select</th>
+                            <th>Purchase ID</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for order in pending_orders %}
+                        <tr>
+                            <td><input type="checkbox" name="selected_orders" value="{{ order.purchase_no }}"></td>
+                            <td><a href="#" class="order-link2 admin-order-link" data-order-id="{{ order.purchase_no }}">{{ order.purchase_no }}</a></td>
+                            <td>{{ order.status }}</td>
+                            <td>
+                                <div class="admin-action-group">
+                                    <button type="submit" name="action" value="approve" class="btn btn-success">Approve</button>
+                                    <button type="submit" name="action" value="reject" class="btn btn-danger">Reject</button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </form>
+    </div>
+</div>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const orderLinks = document.querySelectorAll('.order-link');
@@ -64,7 +65,7 @@
                 event.preventDefault();
                 console.log("p2")
                 const orderID = this.getAttribute('data-order-id');
-                window.location.href = `/cosmic/print_order?order_no=${orderID}`;
+                window.location.href = `/cosmic/print_order?purchase_no=${orderID}`;
             });
         });
     });

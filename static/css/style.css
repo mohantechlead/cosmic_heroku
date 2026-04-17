@@ -193,3 +193,229 @@ a.article:hover {
     bottom: 0;
     left: 0;
   }
+
+body:not(.admin-page) #content {
+    background: linear-gradient(180deg, #f8fbff 0%, #eef4ff 100%);
+}
+
+body:not(.admin-page) .modern-ui-shell {
+    min-height: calc(100vh - 64px);
+    padding: 8px;
+}
+
+body:not(.admin-page) .cosmic-page-frame {
+    width: 100%;
+    margin: 0 auto;
+    border: 0;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 18px 45px rgba(30, 68, 147, 0.12);
+    background: #fff;
+}
+
+body:not(.admin-page) .cosmic-page-header {
+    padding: 24px 30px 18px;
+    background: linear-gradient(135deg, #0f4c81 0%, #2278b6 100%);
+}
+
+body:not(.admin-page) .cosmic-page-header h1 {
+    margin: 0 0 6px;
+    color: #f3f7ff;
+    font-size: 30px;
+    font-weight: 600;
+    letter-spacing: 0.2px;
+    text-shadow: 0 1px 3px rgba(16, 38, 77, 0.45);
+}
+
+body:not(.admin-page) .cosmic-page-header p {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 14px;
+}
+
+body:not(.admin-page) .cosmic-page-body {
+    padding: 12px 10px 14px;
+}
+
+body:not(.admin-page) .cosmic-page-body > .container,
+body:not(.admin-page) .cosmic-page-body > .container-fluid {
+    width: 100%;
+    max-width: none;
+    padding: 0;
+}
+
+body:not(.admin-page) .cosmic-page-body h1,
+body:not(.admin-page) .cosmic-page-body h2,
+body:not(.admin-page) .cosmic-page-body h3 {
+    color: #17335d;
+    font-weight: 600;
+}
+
+body:not(.admin-page) .form-control {
+    border-radius: 10px;
+    border: 1px solid #cfd9ee;
+    min-height: 40px;
+    box-shadow: none;
+}
+
+body:not(.admin-page) .form-control:focus {
+    border-color: #2d77ff;
+    box-shadow: 0 0 0 3px rgba(45, 119, 255, 0.15);
+}
+
+body:not(.admin-page) label {
+    color: #2f3e5f;
+    font-weight: 600;
+    letter-spacing: 0.2px;
+}
+
+body:not(.admin-page) .btn,
+body:not(.admin-page) button[type="submit"] {
+    border: 0;
+    border-radius: 10px;
+    color: #fff;
+    font-weight: 600;
+    background: linear-gradient(135deg, #1948a3 0%, #2d77ff 100%);
+    box-shadow: 0 10px 20px rgba(45, 119, 255, 0.22);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+body:not(.admin-page) .btn:hover,
+body:not(.admin-page) button[type="submit"]:hover {
+    color: #fff;
+    transform: translateY(-1px);
+    box-shadow: 0 14px 24px rgba(45, 119, 255, 0.26);
+}
+
+body:not(.admin-page) .table {
+    width: 100% !important;
+    min-width: 1400px;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #fff;
+}
+
+body:not(.admin-page) .table-responsive {
+    width: 100%;
+    overflow-x: auto;
+    padding-left: 14px;
+    padding-right: 14px;
+    box-sizing: border-box;
+}
+
+body:not(.admin-page) .table th,
+body:not(.admin-page) .table td {
+    white-space: nowrap;
+}
+
+body:not(.admin-page) .table > thead > tr > th {
+    background: #f2f6ff;
+    border-bottom: 1px solid #dbe4f6;
+    color: #1d3761;
+    font-weight: 600;
+}
+
+body:not(.admin-page) .table-striped > tbody > tr:nth-of-type(odd) {
+    background-color: #f9fbff;
+}
+
+@media (max-width: 768px) {
+    body:not(.admin-page) .modern-ui-shell {
+        padding: 8px;
+    }
+
+    body:not(.admin-page) .cosmic-page-header,
+    body:not(.admin-page) .cosmic-page-body {
+        padding-left: 18px;
+        padding-right: 18px;
+    }
+
+    body:not(.admin-page) .cosmic-page-header h1 {
+        font-size: 24px;
+    }
+}
+
+/* ---------------------------------------------------
+   GLOBAL BUTTON SYSTEM
+----------------------------------------------------- */
+
+#content button,
+#content .btn {
+    border-radius: 10px;
+    font-weight: 600;
+    letter-spacing: 0.2px;
+    transition: transform 0.18s ease, box-shadow 0.18s ease, opacity 0.18s ease;
+}
+
+#content .btn:disabled,
+#content button:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+    box-shadow: none !important;
+}
+
+/* Keep sidebar collapse control untouched */
+#content #sidebarCollapse,
+#content #sidebarCollapse:hover,
+#content #sidebarCollapse:focus {
+    background: transparent !important;
+    box-shadow: none !important;
+    transform: none !important;
+}
+
+/* Primary actions across the app */
+#content .btn-primary,
+#content button[type="submit"]:not(.btn-danger):not(.btn-warning):not(.btn-secondary):not(#sidebarCollapse),
+#content .btn-submit-dn,
+#content .btn-submit-grn,
+#content .btn-create-customer {
+    border: 1px solid #1f5ed0 !important;
+    color: #ffffff !important;
+    background: linear-gradient(135deg, #1948a3 0%, #2d77ff 100%) !important;
+    box-shadow: 0 10px 20px rgba(45, 119, 255, 0.24) !important;
+}
+
+#content .btn-primary:hover,
+#content button[type="submit"]:not(.btn-danger):not(.btn-warning):not(.btn-secondary):not(#sidebarCollapse):hover,
+#content .btn-submit-dn:hover,
+#content .btn-submit-grn:hover,
+#content .btn-create-customer:hover {
+    color: #ffffff !important;
+    transform: translateY(-1px);
+    box-shadow: 0 14px 24px rgba(45, 119, 255, 0.28) !important;
+}
+
+/* Secondary / utility buttons */
+#content .btn-secondary,
+#content .btn-add-item {
+    border: 1px solid #c8d9ff !important;
+    color: #2158b8 !important;
+    background: #eef4ff !important;
+    box-shadow: none !important;
+}
+
+#content .btn-secondary:hover,
+#content .btn-add-item:hover {
+    background: #e3edff !important;
+    color: #1a4a9c !important;
+    transform: translateY(-1px);
+}
+
+/* Semantic action variants */
+#content .btn-success {
+    border: 1px solid #1f8e4f !important;
+    background: linear-gradient(135deg, #1f8e4f 0%, #2cae64 100%) !important;
+    color: #ffffff !important;
+}
+
+#content .btn-danger {
+    border: 1px solid #c53b4b !important;
+    background: linear-gradient(135deg, #b42f3f 0%, #d84c5c 100%) !important;
+    color: #ffffff !important;
+}
+
+#content .btn-warning {
+    border: 1px solid #cc8e1b !important;
+    background: linear-gradient(135deg, #d99a24 0%, #ebb039 100%) !important;
+    color: #ffffff !important;
+}

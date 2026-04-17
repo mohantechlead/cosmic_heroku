@@ -1,148 +1,221 @@
 {% extends 'cosmic_base.html' %}
 {% block content %}
-<div class="container">
-    <div class="row">
-        <div class="col-md-12">
-<div>
-    <span class="col-md-3" ></span>
-<h1>Create GRN</h1>
-</div>
+<style>
+    .grn-page-wrap {
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+    }
 
+    .grn-card {
+        background: #ffffff;
+        border: 1px solid #e3eaf9;
+        border-radius: 14px;
+        padding: 18px;
+    }
 
-<br>
+    .grn-card h3 {
+        margin: 0 0 14px;
+        color: #1b3764;
+        font-size: 20px;
+    }
 
-<br>
-<form method="post" action="{% url 'create_grn' %}" id="form1">
-    {% csrf_token %}
-    <div class="form-group col-sm-8">
-        <label class="control-label col-sm-3" style="margin-top: 10px;">Recieved From</label>
-        <div>
-            <input type="text" list="vendor_name" placeholder="Name" name="vendor_name" class="form-control "
-              style="width: 100%;">
-            <datalist id="vendor_name"> 
+    .grn-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px 18px;
+    }
 
-              {% for order in names %}
-              <option value="{{order.vendor_name}}"></option>
-              {% endfor %}
-            </datalist>
-          </div>
-    </div>
-    <div class="col-sm-6">
-        <span class="form-group">
-            <label class="control-label col-sm-4"> GRN Number</label>
-            <div class="col-sm-8">
+    .grn-field {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
 
-                <input type="text" class="form-control" name="GRN_no">
-            </div>
-        </span>
-        
+    .grn-field-wide {
+        grid-column: span 2;
+    }
 
-    </div>
+    .grn-field label {
+        margin: 0;
+        font-size: 13px;
+        font-weight: 600;
+        color: #334a72;
+    }
 
-<div>
-    <div class="col-sm-5">
-        <div class="form-group">
-            <label class="control-label col-sm-4">Date</label>
-            <div class="col-sm-8">
-                <input type="date" name="grn_date" class="form-control datetimepicker-input" data-target="#datepicker1" />
-            </div>
-        </div>
-    </div>
-    <div class="col-sm-8"></div>
-    <div class="col-sm-6">
-        <div class="form-group">
-            <label class="control-label col-sm-4">Transporter Name</label>
-            <div class="col-sm-8" style="margin-top: 10px;">
-                <input type="text" class="form-control" name="transporter_name">
+    .grn-items-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 14px;
+    }
 
-            </div>
-        </div>
-        <span class="form-group">
-            <label class="control-label col-sm-4"> Plate No</label>
-            <div class="col-sm-8">
+    .grn-items-title {
+        margin: 0;
+        color: #1b3764;
+    }
 
-                <input type="text" class="form-control" name="truck_no">
-            </div>
-        </span>
-    </div>
+    .item-list {
+        background: #f9fbff;
+        border: 1px solid #dce6fa;
+        border-radius: 12px;
+        padding: 14px 14px 8px;
+        margin-bottom: 12px;
+        flex: 1 1 calc(50% - 10px);
+    }
 
-    <div class="col-sm-5">
-       
+    .item-list p {
+        display: block;
+        margin-bottom: 10px;
+        color: #2b3f66;
+    }
 
-        <div class="form-group" style="margin-bottom: 10px;">
-            <label class="control-label col-sm-4" style="margin-top: 10px;">Store Name</label>
-            <div class="col-sm-8" style="margin-top: 10px;">
-                <input type="text" list="store_name" placeholder="store" name="store_name" class="form-control "
-              style="width: 100%;">
-            <datalist id="store_name"> 
-                
-              {% for order in grns %}
-              <option value="{{order.store_name}}"></option>
-              {% endfor %}
-            </datalist>
+    .item-list label {
+        display: block;
+        margin-bottom: 4px;
+        font-size: 12px;
+        font-weight: 600;
+        color: #375381;
+    }
 
-            </div>
-            <label class="control-label col-sm-4" style="margin-top: 10px;">Store Keeper</label>
-            <div class="col-sm-8" style="margin-top: 10px;">
-                <input type="text" list="store_keeper" placeholder="keeper" name="store_keeper" class="form-control "
-              style="width: 100%;">
-            <datalist id="store_keeper"> 
-                
-              {% for order in grns %}
-              <option value="{{order.store_keeper}}"></option>
-              {% endfor %}
-            </datalist>
+    .grn-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 8px;
+    }
 
-            </div>
-            
-        </div>
-    </div>
-    
-</div>
+    .btn-add-item {
+        background: #eef4ff !important;
+        color: #2158b8 !important;
+        border: 1px solid #c9dafd !important;
+        box-shadow: none !important;
+    }
 
+    .btn-submit-grn {
+        min-width: 180px;
+    }
 
-</div>
+    #error-container {
+        background: #fff1f1;
+        border: 1px solid #ffcaca;
+        color: #8e1e1e;
+        border-radius: 10px;
+        padding: 10px 12px;
+        margin-top: 10px;
+        display: none;
+    }
 
-</div>
-<div>
-    
-   
-</div>
-</div>
-</form>
-<div class="container">
-    <div class="row">
-        <div class="col-md-12">
-           
-            <form method="post"  id="form2" action="{% url 'create_grn_items' %}">
-                {% csrf_token %}
+    #error-container:not(:empty) {
+        display: block;
+    }
 
-                {{ formset.management_form }}
+    @media (max-width: 900px) {
+        .grn-grid {
+            grid-template-columns: 1fr;
+        }
 
-                <div id="form-lists">
-                    {% for form in formset %}
-            
-                    <div class="item-list card-body row form-group col-md-5">
-            
-                        {{form.as_p}}
-            
-                    </div>
-            
+        .grn-field-wide {
+            grid-column: span 1;
+        }
+
+        .item-list {
+            flex: 1 1 100%;
+        }
+    }
+</style>
+
+<div class="grn-page-wrap">
+    <h1>Create GRN</h1>
+
+    <form method="post" action="{% url 'create_grn' %}" id="form1" class="grn-card">
+        {% csrf_token %}
+        <h3>GRN Details</h3>
+        <div class="grn-grid">
+            <div class="grn-field">
+                <label for="vendor_name">Received From</label>
+                <input id="vendor_name" type="text" list="vendor_names" placeholder="Vendor name" name="vendor_name" class="form-control">
+                <datalist id="vendor_names">
+                    {% for order in names %}
+                    <option value="{{order.vendor_name}}"></option>
                     {% endfor %}
-                </div>
-            
-                <div id="empty-form" class="hidden"> {{ formset.empty_form.as_p}}</div>
-                <button id="add-more" class="btn btn-primary" type="button">Add Item</button>
-              
-            </form>
-        </div></div></div>
+                </datalist>
+            </div>
 
-        <button id="submits" class="col-sm-3 btn-lg " style="color: #6d7fcc; background-color: white; margin-left: 100px;">
-            Submits
-        </button>
+            <div class="grn-field">
+                <label for="GRN_no">GRN Number</label>
+                <input id="GRN_no" type="text" class="form-control" name="GRN_no" placeholder="Enter GRN number">
+            </div>
+
+            <div class="grn-field">
+                <label for="grn_date">Date</label>
+                <input id="grn_date" type="date" name="grn_date" class="form-control datetimepicker-input" data-target="#datepicker1">
+            </div>
+
+            <div class="grn-field">
+                <label for="transporter_name">Transporter Name</label>
+                <input id="transporter_name" type="text" class="form-control" name="transporter_name" placeholder="Transporter name">
+            </div>
+
+            <div class="grn-field">
+                <label for="truck_no">Plate No</label>
+                <input id="truck_no" type="text" class="form-control" name="truck_no" placeholder="Truck plate number">
+            </div>
+
+            <div class="grn-field">
+                <label for="store_name">Store Name</label>
+                <input id="store_name" type="text" list="store_names" placeholder="Store name" name="store_name" class="form-control">
+                <datalist id="store_names">
+                    {% for order in grns %}
+                    <option value="{{order.store_name}}"></option>
+                    {% endfor %}
+                </datalist>
+            </div>
+
+            <div class="grn-field">
+                <label for="store_keeper">Store Keeper</label>
+                <input id="store_keeper" type="text" list="store_keepers" placeholder="Store keeper" name="store_keeper" class="form-control">
+                <datalist id="store_keepers">
+                    {% for order in grns %}
+                    <option value="{{order.store_keeper}}"></option>
+                    {% endfor %}
+                </datalist>
+            </div>
+        </div>
+    </form>
+
+    <form method="post" id="form2" action="{% url 'create_grn_items' %}" class="grn-card">
+        {% csrf_token %}
+        {{ formset.management_form }}
+
+        <div class="grn-items-header">
+            <h3 class="grn-items-title">Item Details</h3>
+            <button id="add-more" class="btn btn-add-item" type="button">+ Add Item</button>
+        </div>
+
+        <div id="form-lists">
+            {% for form in formset %}
+            <div class="item-list">
+                {{form.as_p}}
+            </div>
+            {% endfor %}
+        </div>
+
+        <div id="empty-form" class="hidden">{{ formset.empty_form.as_p }}</div>
+        <div id="error-container"></div>
+    </form>
+
+    <div class="grn-actions">
+        <button id="submits" class="btn btn-submit-grn" type="button">Submit GRN</button>
+    </div>
+</div>
         
         <script>
             document.addEventListener('DOMContentLoaded', function () {
+                const form1 = document.getElementById('form1');
+                const form2 = document.getElementById('form2');
                
                 const radioButtons = document.querySelectorAll('.measurement_type');
                 // const submitsButton = document.querySelector('#submitss');
@@ -284,7 +357,7 @@
                     const formData1 = new FormData(form1);
                     const formData2 = new FormData(form2);
         
-                    const prNoValue = formData1.get('order_no');
+                    const grnNoValue = formData1.get('GRN_no');
         
                     //formData1.set('PR_total_price', univ_total);
                     formData1.set('PR_before_vat', univ_vat);
@@ -292,8 +365,8 @@
                   
                     const amount = 1
                    
-                    console.log(prNoValue)
-                    formData2.append('order_no', prNoValue)
+                    console.log(grnNoValue)
+                    formData2.append('GRN_no', grnNoValue)
         
                     // Use fetch to submit both forms asynchronously
                     fetch(form1.action, {

@@ -16,8 +16,12 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path,include
+from cosmic import views as cosmic_views
+from django.shortcuts import redirect
 
 urlpatterns = [
+    path('', lambda request: redirect('create_orders')),
+    path('admin/', cosmic_views.admin_home, name='admin_home'),
     path('admin/', admin.site.urls),
     path('cosmic/', include('cosmic.urls')),
 

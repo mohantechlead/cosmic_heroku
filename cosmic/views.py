@@ -5,6 +5,7 @@ from .models import *
 from django.contrib.auth.decorators import login_required,user_passes_test
 from django.forms import formset_factory,modelformset_factory
 from django.db.models import Sum
+from django.db.utils import ProgrammingError, OperationalError
 from django.http import JsonResponse,HttpResponse
 from django.template.loader import get_template
 from django.contrib.auth.models import User, auth
@@ -16,6 +17,21 @@ import os
 
 def is_admin(user):
     return user.is_superuser
+
+@login_required
+@user_passes_test(is_admin)
+def admin_home(request):
+    context = {
+        'admin_links': [
+            {'title': 'Order Approval', 'desc': 'Approve or reject new orders.', 'url': 'order_approval'},
+            {'title': 'Order Status', 'desc': 'Update ongoing order statuses.', 'url': 'order_status'},
+            {'title': 'Purchase Approval', 'desc': 'Approve or reject purchase entries.', 'url': 'purchase_approval'},
+            {'title': 'Purchase Status', 'desc': 'Track purchase progress and remarks.', 'url': 'purchase_status'},
+            {'title': 'Rejected Orders', 'desc': 'Restore or delete rejected records.', 'url': 'rejected_orders'},
+            {'title': 'Completed Orders', 'desc': 'Review completed order records.', 'url': 'completed_orders'},
+        ]
+    }
+    return render(request, 'admin/admin_home.html', context)
 
 def create_customer(request):
     if request.method == 'POST':
@@ -545,21 +561,30 @@ def purchase_approval(request):
         if form.is_valid():
             action = form.cleaned_data['action']
             approval_name = form.cleaned_data['approval']
+            selected_orders = form.cleaned_data['selected_orders']
+
+            if not selected_orders:
+                messages.error(request, "Select at least one purchase record.")
+                return redirect('purchase_approval')
             
             if action == 'approve':
-                for pr_no in form.cleaned_data['selected_orders']:
+                for pr_no in selected_orders:
                     stats = request.POST.get(f"{pr_no}_status")
                     purchase_order = cosmic_purchase.objects.get(purchase_no=pr_no.purchase_no)
                     purchase_order.status = 'approved'
                     purchase_order.approved_by = approval_name
                     purchase_order.save()
+                messages.success(request, f"{selected_orders.count()} purchase record(s) approved.")
             elif action == 'reject':
-                for pr_no in form.cleaned_data['selected_orders']:
+                for pr_no in selected_orders:
                     purchase_order = cosmic_purchase.objects.get(purchase_no=pr_no.purchase_no)
                     purchase_order.status = 'rejected'
                     purchase_order.approved_by = approval_name
                     purchase_order.save()
+                messages.success(request, f"{selected_orders.count()} purchase record(s) rejected.")
             return redirect('purchase_approval')
+        messages.error(request, "Please provide approver name and a valid action.")
+        return redirect('purchase_approval')
 
     else:
         form = PurchaseApprovalForm()
@@ -682,6 +707,16 @@ def purchase_status(request):
         return redirect('login')
 
     pending_orders = cosmic_purchase.objects.all().order_by('purchase_no')
+    available_statuses = [
+        'Pending',
+        'approved',
+        'rejected',
+        'processing',
+        'partially_received',
+        'received',
+        'on_hold',
+        'cancelled',
+    ]
     # Handle form submission
     
     if request.method == 'POST':
@@ -691,17 +726,30 @@ def purchase_status(request):
         if form.is_valid():
             action = form.cleaned_data['action']
             approval_name = form.cleaned_data['approval']
+            selected_orders = form.cleaned_data['selected_orders']
             
             if action == 'approve':
-                for pr_no in form.cleaned_data['selected_orders']:
+                if not selected_orders:
+                    messages.error(request, "Select at least one purchase to update.")
+                    return redirect('purchase_status')
+
+                for pr_no in selected_orders:
                     pr_no = pr_no.purchase_no
                     stats = request.POST.get(f"{pr_no}_status")
+                    remarks = request.POST.get(f"{pr_no}_status_remark")
+                    if stats not in available_statuses:
+                        messages.error(request, f"Invalid status selected for {pr_no}.")
+                        return redirect('purchase_status')
                     purchase_order = cosmic_purchase.objects.get(purchase_no=pr_no)
                     purchase_order.status = stats
+                    purchase_order.status_remark = remarks
                     purchase_order.approved_by = approval_name
                     purchase_order.save()
+                messages.success(request, f"Updated status for {selected_orders.count()} purchase record(s).")
           
             return redirect('purchase_status')
+        messages.error(request, "Please provide approver name and action.")
+        return redirect('purchase_status')
 
     else:
         form = PurchaseApprovalForm()
@@ -709,6 +757,7 @@ def purchase_status(request):
     context = {
         'pending_orders': pending_orders,
         'form': form,
+        'available_statuses': available_statuses,
     }
 
    
@@ -1906,5 +1955,21 @@ def create_dn(request):
     return render(request, 'create_dn.html')
 
 def display_dn(request):
-    return render(request, 'display_dn.html')
+    if request.method == 'GET':
+        dn_error = None
+        try:
+            deliveries = list(
+                cosmic_delivery.objects.all().order_by('-delivery_date', '-delivery_number')
+            )
+        except (ProgrammingError, OperationalError):
+            deliveries = []
+            dn_error = "Delivery table is not available in the current database yet."
+
+        context = {
+            'my_dn': deliveries,
+            'dn_error': dn_error,
+        }
+        return render(request, 'display_dn.html', context)
+
+    return render(request, 'display_dn.html', {'my_dn': [], 'dn_error': None})
 

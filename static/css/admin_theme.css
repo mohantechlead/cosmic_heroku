@@ -1,0 +1,124 @@
+body.admin-page #content {
+    background: linear-gradient(180deg, #f7f9fc 0%, #edf2fb 100%);
+}
+
+body.admin-page .modern-ui-shell {
+    padding: 8px;
+}
+
+.admin-workspace {
+    width: 100%;
+    max-width: none;
+    margin: 0 auto;
+    background: #ffffff;
+    border: 1px solid #dce6f8;
+    border-radius: 16px;
+    box-shadow: 0 16px 36px rgba(16, 43, 95, 0.12);
+    overflow: hidden;
+}
+
+.admin-workspace-header {
+    padding: 18px 24px;
+    background: linear-gradient(135deg, #113a70 0%, #1f65b0 100%);
+    color: #f7fbff;
+}
+
+.admin-workspace-header h2 {
+    margin: 0;
+    color: inherit;
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.admin-workspace-body {
+    padding: 10px;
+}
+
+.admin-toolbar {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+}
+
+.admin-toolbar label {
+    margin: 0;
+    min-width: 95px;
+    color: #2a4674;
+    font-weight: 600;
+}
+
+.admin-toolbar .form-control {
+    max-width: 320px;
+}
+
+.admin-messages {
+    margin: 0 0 12px;
+    padding: 10px 14px;
+    list-style: none;
+    background: #fff2f2;
+    color: #8b1d1d;
+    border: 1px solid #ffc8c8;
+    border-radius: 10px;
+}
+
+.admin-table-wrap {
+    overflow-x: auto;
+    padding-left: 14px;
+    padding-right: 14px;
+    box-sizing: border-box;
+}
+
+.admin-table {
+    width: 100%;
+    min-width: 1400px;
+    margin: 0;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.admin-table thead th {
+    background: #edf3ff;
+    color: #1f3f70;
+    font-weight: 700;
+    border-bottom: 1px solid #d9e4f8;
+}
+
+.admin-table th,
+.admin-table td {
+    padding: 10px 12px;
+    vertical-align: middle !important;
+    white-space: nowrap;
+}
+
+.admin-table tbody tr:nth-child(odd) {
+    background: #f9fbff;
+}
+
+.admin-action-group {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.admin-order-link {
+    color: #1a5fca;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.admin-order-link:hover {
+    color: #144a9c;
+    text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+    body.admin-page .modern-ui-shell {
+        padding: 12px;
+    }
+
+    .admin-workspace-body {
+        padding: 14px;
+    }
+}

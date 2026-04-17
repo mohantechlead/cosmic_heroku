@@ -1,5 +1,102 @@
 {% extends 'cosmic_base.html' %}
 
 {% block content %}
+<style>
+    .dn-display-wrap {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .dn-display-card {
+        background: #fff;
+        border: 1px solid #e3eaf9;
+        border-radius: 14px;
+        padding: 18px;
+    }
+
+    .dn-display-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-bottom: 12px;
+    }
+
+    .dn-display-head h3 {
+        margin: 0;
+        color: #1b3764;
+    }
+
+    .dn-count {
+        font-size: 13px;
+        color: #4a638f;
+        background: #eef4ff;
+        border: 1px solid #d5e3ff;
+        border-radius: 999px;
+        padding: 4px 10px;
+    }
+
+    .dn-empty {
+        padding: 22px;
+        border: 1px dashed #c9d9f8;
+        border-radius: 12px;
+        background: #f8fbff;
+        color: #36507c;
+    }
+</style>
+
+<div class="dn-display-wrap">
+    <h1>Display Delivery Notes</h1>
+
+    {% if dn_error %}
+    <div class="alert alert-warning">
+        {{ dn_error }}
+    </div>
+    {% endif %}
+
+    <div class="dn-display-card">
+        <div class="dn-display-head">
+            <h3>Delivery Records</h3>
+            <span class="dn-count">{{ my_dn|length }} total</span>
+        </div>
+
+        {% if my_dn %}
+        <div class="admin-table-wrap">
+            <table id="example" class="table table-striped table-bordered admin-table">
+                <thead>
+                    <tr>
+                        <th>Delivery No</th>
+                        <th>Date</th>
+                        <th>Quantity</th>
+                        <th>Truck Number</th>
+                        <th>Driver Name</th>
+                        <th>Recipient Name</th>
+                        <th>Remarks</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for dn in my_dn %}
+                    <tr>
+                        <td>{{ dn.delivery_number }}</td>
+                        <td>{{ dn.delivery_date }}</td>
+                        <td>{{ dn.delivery_quantity }}</td>
+                        <td>{{ dn.truck_number|default:"-" }}</td>
+                        <td>{{ dn.driver_name|default:"-" }}</td>
+                        <td>{{ dn.recipient_name|default:"-" }}</td>
+                        <td>{{ dn.delivery_comment|default:"-" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="dn-empty">
+            No delivery notes available yet. Create one from the Delivery Input page to see it listed here.
+        </div>
+        {% endif %}
+    </div>
+</div>
 
 {% endblock %}

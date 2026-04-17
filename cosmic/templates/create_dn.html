@@ -1,92 +1,127 @@
 {% extends 'cosmic_base.html' %}
 {% block content %}
+<style>
+  .dn-page-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
 
-    <h1>Input Delivery Information</h1>
-   
-    {% if error_message %}
-    <div class="alert alert-danger">
-      {{ error_message }}
+  .dn-card {
+    background: #ffffff;
+    border: 1px solid #e3eaf9;
+    border-radius: 14px;
+    padding: 20px;
+  }
+
+  .dn-card h3 {
+    margin: 0 0 16px;
+    color: #1b3764;
+    font-size: 20px;
+  }
+
+  .dn-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px 18px;
+  }
+
+  .dn-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .dn-field-wide {
+    grid-column: span 2;
+  }
+
+  .dn-field label {
+    margin: 0;
+    font-size: 13px;
+    font-weight: 600;
+    color: #334a72;
+  }
+
+  .dn-field textarea.form-control {
+    min-height: 120px;
+    resize: vertical;
+  }
+
+  .dn-actions {
+    margin-top: 18px;
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .btn-submit-dn {
+    min-width: 170px;
+  }
+
+  @media (max-width: 900px) {
+    .dn-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .dn-field-wide {
+      grid-column: span 1;
+    }
+  }
+</style>
+
+<div class="dn-page-wrap">
+  <h1>Input Delivery Information</h1>
+
+  {% if error_message %}
+  <div class="alert alert-danger">
+    {{ error_message }}
+  </div>
+  {% endif %}
+
+  <form action="{% url 'create_dn' %}" method="post" class="dn-card">
+    {% csrf_token %}
+    <h3>Delivery Details</h3>
+
+    <div class="dn-grid">
+      <div class="dn-field">
+        <label for="delivery_number">Delivery Number</label>
+        <input id="delivery_number" type="text" class="form-control" name="delivery_number" placeholder="Enter delivery number">
+      </div>
+
+      <div class="dn-field">
+        <label for="delivery_date">Delivery Date</label>
+        <input id="delivery_date" type="date" name="delivery_date" class="form-control datetimepicker-input" data-target="#datepicker1">
+      </div>
+
+      <div class="dn-field">
+        <label for="delivery_quantity">Delivery Quantity</label>
+        <input id="delivery_quantity" type="text" class="form-control" name="delivery_quantity" placeholder="Enter quantity">
+      </div>
+
+      <div class="dn-field">
+        <label for="driver_name">Driver Name</label>
+        <input id="driver_name" type="text" class="form-control" name="driver_name" placeholder="Driver full name">
+      </div>
+
+      <div class="dn-field">
+        <label for="truck_number">Truck Number</label>
+        <input id="truck_number" type="text" class="form-control" name="truck_number" placeholder="Plate number">
+      </div>
+
+      <div class="dn-field">
+        <label for="recipient_name">Recipient Name</label>
+        <input id="recipient_name" type="text" class="form-control" name="recipient_name" placeholder="Receiving person/company">
+      </div>
+
+      <div class="dn-field dn-field-wide">
+        <label for="comment">Remarks</label>
+        <textarea class="form-control" id="comment" name="comment" placeholder="Add delivery notes, conditions, or instructions"></textarea>
+      </div>
     </div>
-    {% endif %}
-    <form action="{% url 'create_dn' %}" method="post">
-        {% csrf_token %}
 
-        <div class="col-sm-6" style="margin-top: 10px;">
-            <div class="form-group" style="margin-bottom: 10px;">
-              <label class="control-label col-sm-4" > Delivery Number</label>
-              <div class="col-sm-8">
-                <!-- <input type="text" class="form-control" value="{{ next_order_number }}" readonly> -->
-                <input type="text" class="form-control" name="delivery_number">
-              </div>
-            </div> 
-        
-            <div class="form-group" style="margin-top: 10px;">
-              <label class="control-label col-sm-4">Delivery Date</label>
-              <div class="col-sm-8" style="margin-top: 10px;">
-                <input type="date" name="delivery_date" class="form-control datetimepicker-input" data-target="#datepicker1" >
-              </div>
-            </div>
-        
-          </div>
-    
-      <div class="col-sm-5" style="margin-top: 10px;">
-        <div class="form-group" style="margin-bottom: 10px;">
-          <label class="control-label col-sm-6"> Delivery Quantity</label>
-          <div class="col-sm-8">
-            <input type="text" class="form-control" name="delivery_quantity">
-          </div>
-        </div> 
-    
-    
-      </div>
-      <div class="col-sm-6" style="margin-top: 10px;">
-        <div class="form-group" style="margin-bottom: 10px;">
-          <label class="control-label col-sm-4"> Driver Name</label>
-          <div class="col-sm-8">
-            <input type="text" class="form-control" name="driver_name">
-          </div>
-        </div> 
-    
-    
-      </div>
-      <div class="col-sm-6" style="margin-top: 10px;">
-        <div class="form-group" >
-          <label class="control-label col-sm-6">Truck Number</label>
-          <div class="col-sm-8" style="margin-top: 10px;">
-            <input type="text" class="form-control" name="truck_number">
-          </div>
-        </div>
-      </div>
-      <div class="col-sm-5" >
-        <div class="form-group">
-          <label class="control-label col-sm-6"> Recipient Name</label>
-          <div class="col-sm-8">
-            <input type="text" class="form-control" name="recipient_name">
-          </div>
-        </div> 
-    
-       
-    
-      </div>
-      <div class="col-sm-10" style="margin-top: 10px;">
-        <div class="form-group">
-          <label class="control-label col-sm-8">Remarks</label>
-          <div class="col-sm-10">
-            <textarea type="text" class="form-control" id="comment" name="comment"></textarea>
-          </div>
-        </div> 
-      
-      
-      
-      </div>
-      <span class="col-sm-4"></span>
-      <div style="justify-content: center;">
-        <button type="submit"  class="col-sm-2 btn-lg " style="color: #6d7fcc; background-color: white;">
-          
-          Submit
-      </button>
-       </div>
-    </form>
-
-
+    <div class="dn-actions">
+      <button type="submit" class="btn btn-submit-dn">Submit Delivery Note</button>
+    </div>
+  </form>
+</div>
 {% endblock %}

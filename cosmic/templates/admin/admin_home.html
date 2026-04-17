@@ -1,0 +1,71 @@
+{% extends "cosmic_base.html" %}
+
+{% block body_class %}admin-page{% endblock %}
+
+{% block content %}
+<style>
+    .admin-home-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 14px;
+    }
+
+    .admin-home-card {
+        display: block;
+        background: #ffffff;
+        border: 1px solid #dde7f8;
+        border-radius: 12px;
+        padding: 14px;
+        color: #24406e;
+        text-decoration: none;
+        transition: transform 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease;
+    }
+
+    .admin-home-card h4 {
+        margin: 0 0 6px;
+        color: #1a3e74;
+        font-weight: 700;
+    }
+
+    .admin-home-card p {
+        margin: 0;
+        color: #46608a;
+        font-size: 13px;
+        line-height: 1.45;
+    }
+
+    .admin-home-card:hover {
+        transform: translateY(-2px);
+        border-color: #bcd3f6;
+        box-shadow: 0 14px 24px rgba(28, 74, 150, 0.15);
+    }
+
+    @media (max-width: 1024px) {
+        .admin-home-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+
+    @media (max-width: 640px) {
+        .admin-home-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="admin-workspace">
+    <div class="admin-workspace-header">
+        <h2>Admin Dashboard</h2>
+    </div>
+    <div class="admin-workspace-body">
+        <div class="admin-home-grid">
+            {% for link in admin_links %}
+            <a class="admin-home-card" href="{% url link.url %}">
+                <h4>{{ link.title }}</h4>
+                <p>{{ link.desc }}</p>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

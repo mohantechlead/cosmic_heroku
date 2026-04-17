@@ -11,9 +11,9 @@
   <br>
 
   
-<div class="container">
-
-  <table class="table table-striped table-bordered" style="margin-top: 20px;" id="example">
+<div>
+  <div class="admin-table-wrap">
+  <table class="table table-striped table-bordered admin-table" style="margin-top: 20px;" id="example">
     <thead>
     <tr>
       <th>Customer Name</th>
@@ -27,7 +27,7 @@
   <tbody>
     {% for customer in my_customer %}
     <tr>
-       <td><a href="/cosmic/display_customer_profile/{{customer.customer_name}}">{{ customer.customer_name }}</a></td>
+       <td><a class="admin-order-link" href="/cosmic/display_customer_profile/{{customer.customer_name}}">{{ customer.customer_name }}</a></td>
       <td><a href="#">{{ customer.phone_number }}</a></td>
       <td><a href="#" >{{ customer.email }}</a></td>
       <td><a href="#">{{ customer.date }}</a></td>
@@ -37,6 +37,7 @@
     {% endfor %}
   </tbody>
   </table>
+  </div>
 
   
 </div>

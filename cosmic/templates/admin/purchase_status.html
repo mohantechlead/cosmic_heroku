@@ -1,54 +1,71 @@
 <!-- templates/admin/custom_report.html -->
 {% extends "cosmic_base.html" %}
 
+{% block body_class %}admin-page{% endblock %}
+
 {% block content %}
-{% if messages %}
-    <ul class="messages" style="color: red;">
-        {% for message in messages %}
-            <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-        {% endfor %}
-    </ul>
-{% endif %}
-<form method="post">
-    {% csrf_token %}
-    <div style="margin:70px 0px 30px 40px;"><h3>Update Purchase Status</h3></div>
-    <div>
-        <div class="col-sm-7" style="text-align: right;"> Approved By:</div>
-        <div class="col-sm-3">
-            <input type="text" name="approval" id="approval" class="form-control" placeholder="Approved By">
+<div class="admin-workspace">
+    <div class="admin-workspace-header">
+        <h2>Update Purchase Status</h2>
     </div>
-       </div>
-    <table class="table table-striped table-bordered" style="margin-top: 50px; margin-left: 30px;">
-        <thead>
-            <tr>
-                <th>No.</th>
-                <th>Selects</th>
-                <th>Purchase ID</th>
-                <th>Status</th>
-                <th>Update Status</th>
-                <th>Remark</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for order in pending_orders %}
-                <tr>
-                    <td>{{ forloop.counter }}</td>
-                    <td><input type="checkbox" name="selected_orders" value="{{ order.purchase_no }}"></td> 
-                    <td><a href="#" class="order-link2" data-order-id="{{ order.purchase_no}}">{{ order.purchase_no }}</a></td>
-                    <td>{{ order.status }}</td>
-                    <td> <input type="text" placeholder="New Status" class="form-control" name="{{ order.purchase_no }}_status"></td>
-                    <td><input type="text" class="form-control" placeholder="Reason" name = "{{order.purchase_no}}_status_remark" value="{{ order.status_remark }}"> </td>
-                    <td>
-                        <button type="submit" name="action" value="approve">Update</button>
-                    </td>
-                </tr>
+    <div class="admin-workspace-body">
+        {% if messages %}
+        <ul class="admin-messages">
+            {% for message in messages %}
+            <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
             {% endfor %}
-        </tbody>
-    </table>
-    
-    
-</form>
+        </ul>
+        {% endif %}
+        <form method="post">
+            {% csrf_token %}
+            <div class="admin-toolbar">
+                <label for="approval">Approved By</label>
+                <input type="text" name="approval" id="approval" class="form-control" placeholder="Enter approver name">
+            </div>
+
+            <div class="admin-table-wrap">
+                <table class="table table-striped table-bordered admin-table">
+                    <thead>
+                        <tr>
+                            <th>No.</th>
+                            <th>Select</th>
+                            <th>Purchase ID</th>
+                            <th>Status</th>
+                            <th>Update Status</th>
+                            <th>Remark</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for order in pending_orders %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td><input type="checkbox" name="selected_orders" value="{{ order.purchase_no }}"></td>
+                            <td><a href="#" class="order-link2 admin-order-link" data-order-id="{{ order.purchase_no }}">{{ order.purchase_no }}</a></td>
+                            <td>{{ order.status }}</td>
+                            <td>
+                                <select class="form-control" name="{{ order.purchase_no }}_status">
+                                    {% for status_value in available_statuses %}
+                                    <option value="{{ status_value }}" {% if order.status == status_value %}selected{% endif %}>
+                                        {{ status_value|title }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </td>
+                            <td><input type="text" class="form-control" placeholder="Reason" name="{{order.purchase_no}}_status_remark" value="{{ order.status_remark }}"></td>
+                            <td>
+                                <div class="admin-action-group">
+                                    <button type="submit" name="action" value="approve" class="btn btn-primary">Update</button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </form>
+    </div>
+</div>
 
 {% endblock %}
 
