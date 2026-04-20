@@ -1,7 +1,77 @@
 {% extends 'cosmic_base.html' %}
 {% block body_class %}print-document{% endblock %}
 {% block content %}
-<div class="form-group ">
+<style>
+    .print-toolbar {
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: 10px;
+        gap: 8px;
+    }
+
+    .print-note {
+        font-size: 12px;
+        color: #38527d;
+        margin-right: auto;
+        align-self: center;
+    }
+
+    @media print {
+        .print-toolbar {
+            display: none !important;
+        }
+
+        body.print-document .modern-ui-shell,
+        body.print-document .cosmic-page-frame,
+        body.print-document .cosmic-page-body {
+            padding: 0 !important;
+            margin: 0 !important;
+            box-shadow: none !important;
+            background: transparent !important;
+        }
+
+        body.print-document #content .printable-sale-area {
+            display: block !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            width: 100% !important;
+            transform: scale(0.9);
+            transform-origin: top left;
+            width: 111% !important;
+        }
+
+        body.print-document #content .printable-sale-area > div:last-child {
+            margin-bottom: 0 !important;
+            padding-bottom: 0 !important;
+        }
+
+        body.print-document #content .printable-sale-area .table-responsive {
+            overflow: visible !important;
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+        }
+
+        body.print-document #content .printable-sale-area table {
+            width: 100% !important;
+            min-width: 0 !important;
+            table-layout: fixed !important;
+        }
+
+        body.print-document #content .printable-sale-area th,
+        body.print-document #content .printable-sale-area td {
+            white-space: normal !important;
+            word-break: break-word !important;
+            overflow-wrap: anywhere !important;
+        }
+    }
+</style>
+
+<div class="print-toolbar block-print">
+    <span class="print-note"> </span>
+    <button type="button" class="btn btn-primary" onclick="window.print()">Print / Save PDF</button>
+</div>
+
+<div class="form-group printable-sale-area">
     <div class="invoice-header" style="display: flex;">
         <div class="text-muted">
             <img src="../static/logo.jpg" alt="" style="width: 150px; border-radius: 50%; margin-left: 380px;">
