@@ -24,7 +24,7 @@
 
         @page {
             size: A4 portrait;
-            margin: 3mm;
+            margin: 4mm;
         }
 
         body.print-document .modern-ui-shell,
@@ -41,9 +41,9 @@
             margin: 0 !important;
             padding: 0 !important;
             width: 100% !important;
-            transform: scale(0.82);
+            transform: scale(0.88);
             transform-origin: top left;
-            width: 122% !important;
+            width: 114% !important;
         }
 
         body.print-document #content .printable-sale-area .invoice-header {
@@ -65,16 +65,41 @@
         body.print-document #content .printable-sale-area table {
             width: 100% !important;
             min-width: 0 !important;
-            table-layout: fixed !important;
+            table-layout: auto !important;
         }
 
         body.print-document #content .printable-sale-area th,
         body.print-document #content .printable-sale-area td {
             white-space: normal !important;
-            word-break: break-word !important;
-            overflow-wrap: anywhere !important;
-            padding: 4px 6px !important;
-            line-height: 1.2 !important;
+            word-break: normal !important;
+            overflow-wrap: break-word !important;
+            padding: 3px 5px !important;
+            line-height: 1.15 !important;
+            font-size: 12px !important;
+        }
+
+        body.print-document #content .printable-sale-area h3,
+        body.print-document #content .printable-sale-area h4,
+        body.print-document #content .printable-sale-area h5,
+        body.print-document #content .printable-sale-area p {
+            margin-top: 2px !important;
+            margin-bottom: 2px !important;
+            line-height: 1.15 !important;
+        }
+
+        body.print-document #content .printable-sale-area hr {
+            margin-top: 4px !important;
+            margin-bottom: 4px !important;
+        }
+
+        body.print-document #content img[src$="stamp.jpg"] {
+            width: 130px !important;
+            height: 130px !important;
+        }
+
+        body.print-document #content img[src$="sign.jpg"] {
+            width: 116px !important;
+            height: 38px !important;
         }
 
         body.print-document #content .printable-sale-area .invoice-header img {

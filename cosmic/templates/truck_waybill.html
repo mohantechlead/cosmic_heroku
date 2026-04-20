@@ -21,6 +21,11 @@
             display: none !important;
         }
 
+        @page {
+            size: A4 portrait;
+            margin: 4mm;
+        }
+
         body.print-document .modern-ui-shell,
         body.print-document .cosmic-page-frame,
         body.print-document .cosmic-page-body {
@@ -35,9 +40,9 @@
             margin: 0 !important;
             padding: 0 !important;
             width: 100% !important;
-            transform: scale(0.9);
+            transform: scale(0.88);
             transform-origin: top left;
-            width: 111% !important;
+            width: 114% !important;
         }
 
         body.print-document #content .printable-sale-area > div:last-child {
@@ -54,14 +59,48 @@
         body.print-document #content .printable-sale-area table {
             width: 100% !important;
             min-width: 0 !important;
-            table-layout: fixed !important;
+            table-layout: auto !important;
         }
 
         body.print-document #content .printable-sale-area th,
         body.print-document #content .printable-sale-area td {
             white-space: normal !important;
-            word-break: break-word !important;
-            overflow-wrap: anywhere !important;
+            word-break: normal !important;
+            overflow-wrap: break-word !important;
+            padding: 3px 5px !important;
+            line-height: 1.15 !important;
+            font-size: 12px !important;
+        }
+
+        body.print-document #content .printable-sale-area h3,
+        body.print-document #content .printable-sale-area h4,
+        body.print-document #content .printable-sale-area h5,
+        body.print-document #content .printable-sale-area p {
+            margin-top: 2px !important;
+            margin-bottom: 2px !important;
+            line-height: 1.15 !important;
+        }
+
+        body.print-document #content .printable-sale-area hr {
+            margin-top: 4px !important;
+            margin-bottom: 4px !important;
+        }
+
+        body.print-document #content .printable-sale-area table,
+        body.print-document #content .printable-sale-area tr,
+        body.print-document #content .printable-sale-area td,
+        body.print-document #content .printable-sale-area th {
+            page-break-inside: avoid !important;
+        }
+
+        body.print-document #content img[src$="stamp.jpg"] {
+            width: 130px !important;
+            height: 130px !important;
+        }
+
+        body.print-document #content img[src$="sign.jpg"] {
+            width: 116px !important;
+            height: 38px !important;
         }
     }
 </style>
@@ -318,6 +357,10 @@
         <h5>Total No of Packages {{shipping.total_bags}} packages</h5>
         <div  style="margin-top: 0px;">
             <p>{{shipping.waybill_remark}}</p>
+        </div>
+        <div style="float: right; display: flex; flex-direction: column; align-items: flex-start; gap: 6px;">
+            <img alt="" src="/static/stamp.jpg" height="154px" width="154px" style="margin-top: 10px; margin-bottom: 0;">
+            <img alt="" src="/static/sign.jpg" height="44px" width="134px" style="margin-top: 0;">
         </div>
         
     </div>
