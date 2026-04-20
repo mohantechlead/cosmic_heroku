@@ -55,6 +55,25 @@
             margin-bottom: 0 !important;
             padding-bottom: 0 !important;
         }
+
+        body.print-document #content .printable-sale-area .table-responsive {
+            overflow: visible !important;
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+        }
+
+        body.print-document #content .printable-sale-area table {
+            width: 100% !important;
+            min-width: 0 !important;
+            table-layout: fixed !important;
+        }
+
+        body.print-document #content .printable-sale-area th,
+        body.print-document #content .printable-sale-area td {
+            white-space: normal !important;
+            word-break: break-word !important;
+            overflow-wrap: anywhere !important;
+        }
     }
 </style>
 
