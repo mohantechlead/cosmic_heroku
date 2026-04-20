@@ -941,10 +941,16 @@ def edit_order_only(request):
 
         my_customers = request.POST.get('customer_name')
         suppliers = request.POST.get('supplier_name')
-        customer = customer_profile.objects.get(customer_name=my_customers)
-        cosmic_order_instance.customer_name = customer
-        supplier = supplier_profile.objects.get(supplier_name=suppliers)
-        cosmic_order_instance.supplier_name = supplier
+        try:
+            customer = customer_profile.objects.get(customer_name=my_customers)
+            cosmic_order_instance.customer_name = customer
+        except customer_profile.DoesNotExist:
+            pass
+        try:
+            supplier = supplier_profile.objects.get(supplier_name=suppliers)
+            cosmic_order_instance.supplier_name = supplier
+        except supplier_profile.DoesNotExist:
+            pass
         print(cosmic_order_instance.__dict__) 
         cosmic_order_instance.save()
         return render(request, 'edit_order_only.html')  # Redirect to a success page or another URL
@@ -1690,31 +1696,27 @@ def update_order(request):
         print(request.POST)
         order_no = request.POST.get('order_no')
         cosmic_order_instance = get_object_or_404(cosmic_order, order_no=order_no)
-        order_item_formset = modelformset_factory(order_item, form=OrderItemForm, extra=0)
-     
-        formset = order_item_formset(request.POST)
+        queryset = order_item.objects.filter(order_no=cosmic_order_instance)
+        order_item_formset = modelformset_factory(order_item, form=OrderItemForm, extra=0, can_delete=True)
+        formset = order_item_formset(request.POST, queryset=queryset)
         if formset.is_valid():
             instances = formset.save(commit=False)
-            if instances:
-                final_price = 0
-            else:
-                final_price = cosmic_order_instance.PR_before_vat
+            for deleted in formset.deleted_objects:
+                deleted.delete()
+
             for instance in instances:
-                final_price += instance.before_vat
-                
-                print("Field names:", instance.__dict__.keys())
                 instance.order_no = cosmic_order_instance
-                print(final_price,"price")
                 instance.save()
+
+            final_price = order_item.objects.filter(order_no=cosmic_order_instance).aggregate(total=Sum('before_vat'))['total'] or 0
             cosmic_order_instance.PR_before_vat = final_price
             cosmic_order_instance.save()
-            # Redirect to another page after saving all instances
             return render(request, "create_order.html")
     else:
         order_no = request.GET.get('order_no')
         cosmic_order_instance = get_object_or_404(cosmic_order, order_no=order_no)
 
-        order_item_formset = modelformset_factory(order_item, form=OrderItemForm, extra=0)
+        order_item_formset = modelformset_factory(order_item, form=OrderItemForm, extra=0, can_delete=True)
         queryset = order_item.objects.filter(order_no=cosmic_order_instance)
         formset = order_item_formset(queryset=queryset)
     
@@ -1777,28 +1779,26 @@ def update_shipping(request):
         print(request.POST)
         invoice_no = request.POST.get('invoice_num')
         shipping_instance = get_object_or_404(shipping_info, invoice_num=invoice_no)
-        invoice_item_formset = modelformset_factory(invoice_item, form=InvoiceItemForm, extra=0)  
+        queryset = invoice_item.objects.filter(invoice_num=shipping_instance)
+        invoice_item_formset = modelformset_factory(invoice_item, form=InvoiceItemForm, extra=0, can_delete=True)  
         print(shipping_instance.invoice_date,"date")
-        formset = invoice_item_formset(request.POST)
+        formset = invoice_item_formset(request.POST, queryset=queryset)
         if formset.is_valid():
             print("valid")
-            # instances = formset.save(commit=False)
-            final_price = 0
-            total_bags = 0
-            for instance in formset:
-                print("here")
-                total_bags += int(instance.cleaned_data['bags'])
-                final_price += float(instance.cleaned_data['before_vat'])
-                print("Field names:", instance.__dict__.keys())
+            instances = formset.save(commit=False)
+            for deleted in formset.deleted_objects:
+                deleted.delete()
+
+            for instance in instances:
                 instance.invoice_num = shipping_instance
-                print(final_price,"price")
-                print(instance,"instance")
-                
                 instance.save()
+
+            aggregates = invoice_item.objects.filter(invoice_num=shipping_instance).aggregate(total_price=Sum('before_vat'), total_bags=Sum('bags'))
+            final_price = aggregates['total_price'] or 0
+            total_bags = aggregates['total_bags'] or 0
             shipping_instance.final_price = final_price
             shipping_instance.total_bags = total_bags
             shipping_instance.save()
-            # Redirect to another page after saving all instances
             return render(request, "create_order.html")
     else:
         invoice_no = request.GET.get('invoice_num')
@@ -1806,7 +1806,7 @@ def update_shipping(request):
         shipping_instance.final_price = 0.0
         date = shipping_instance.invoice_date
         date = str(date)
-        invoice_item_formset = modelformset_factory(invoice_item, form=InvoiceItemForm, extra=0)
+        invoice_item_formset = modelformset_factory(invoice_item, form=InvoiceItemForm, extra=0, can_delete=True)
         queryset = invoice_item.objects.filter(invoice_num=shipping_instance)
         formset = invoice_item_formset(queryset=queryset)
         print(shipping_instance.invoice_date,"date")

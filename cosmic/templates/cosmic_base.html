@@ -483,10 +483,17 @@
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             var stack = document.getElementById('toast-stack');
-            if (!stack) return;
+            function ensureToastStack() {
+                var existing = document.getElementById('toast-stack');
+                if (existing) return existing;
+                var newStack = document.createElement('div');
+                newStack.className = 'toast-stack';
+                newStack.id = 'toast-stack';
+                document.body.appendChild(newStack);
+                return newStack;
+            }
 
-            var toasts = Array.from(stack.querySelectorAll('.toast-item'));
-            toasts.forEach(function (toast) {
+            function wireToast(toast) {
                 var closeBtn = toast.querySelector('.toast-close');
                 if (closeBtn) {
                     closeBtn.addEventListener('click', function () {
@@ -501,7 +508,26 @@
                         toast.remove();
                     }, 220);
                 }, 3500);
-            });
+            }
+
+            window.showToast = function (message, type) {
+                var toastStack = ensureToastStack();
+                var safeType = ['success', 'error', 'warning', 'info'].includes(type) ? type : 'info';
+                var toast = document.createElement('div');
+                toast.className = 'toast-item toast-' + safeType;
+                toast.innerHTML = '<span></span><button type="button" class="toast-close" aria-label="Close">&times;</button>';
+                toast.querySelector('span').textContent = message;
+                toastStack.appendChild(toast);
+                wireToast(toast);
+            };
+
+            var toasts = Array.from((stack || ensureToastStack()).querySelectorAll('.toast-item'));
+            toasts.forEach(wireToast);
+
+            // Global fallback: replace browser alert popups with toast.
+            window.alert = function (message) {
+                window.showToast(String(message || 'Action completed.'), 'error');
+            };
         });
     </script>
 </body>

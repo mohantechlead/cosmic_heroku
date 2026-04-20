@@ -24,7 +24,7 @@
 
         @page {
             size: A4 portrait;
-            margin: 5mm;
+            margin: 3mm;
         }
 
         body.print-document .modern-ui-shell,
@@ -41,9 +41,9 @@
             margin: 0 !important;
             padding: 0 !important;
             width: 100% !important;
-            transform: scale(0.9);
+            transform: scale(0.82);
             transform-origin: top left;
-            width: 111% !important;
+            width: 122% !important;
         }
 
         body.print-document #content .printable-sale-area .invoice-header {
@@ -73,6 +73,26 @@
             white-space: normal !important;
             word-break: break-word !important;
             overflow-wrap: anywhere !important;
+            padding: 4px 6px !important;
+            line-height: 1.2 !important;
+        }
+
+        body.print-document #content .printable-sale-area .invoice-header img {
+            margin-left: 0 !important;
+            display: block;
+            margin-right: auto;
+            margin-left: auto !important;
+        }
+
+        body.print-document #content .printable-sale-area .invoice-header h3,
+        body.print-document #content .printable-sale-area .invoice-header p,
+        body.print-document #content .printable-sale-area .invoice-header h4 {
+            margin-left: 0 !important;
+            text-align: center !important;
+        }
+
+        body.print-document #content .printable-sale-area .invoice-header h4 {
+            margin-top: 12px !important;
         }
     }
 </style>
@@ -407,17 +427,17 @@
             
             </div> 
     
-            <div style="flex: 1;"> 
-                <img  alt="" src="/static/stamp.jpg" height="154px" width="154px" style="margin-top: 30px;"> <br>
-                <img  alt="" src="/static/sign.jpg" height="44px" width="134px">
+            <div style="flex: 1; display: flex; flex-direction: column; align-items: flex-start; gap: 0;"> 
+                <img  alt="" src="/static/stamp.jpg" height="154px" width="154px" style="margin-top: 26px; margin-bottom: 0;">
+                <img  alt="" src="/static/sign.jpg" height="44px" width="134px" style="margin-top: -13px;">
             </div>
           </div> 
        
     </div>
         {%else%}
-        <div style="float: right;"> 
-            <img  alt="" src="../../static/stamp.jpg" height="154px" width="154px" style="margin-top: 10px;"> <br>
-            <img  alt="" src="/static/sign.jpg" height="44px" width="134px">
+        <div style="float: right; display: flex; flex-direction: column; align-items: flex-start; gap: 0;"> 
+            <img  alt="" src="../../static/stamp.jpg" height="154px" width="154px" style="margin-top: 10px; margin-bottom: 0;">
+            <img  alt="" src="/static/sign.jpg" height="44px" width="134px" style="margin-top: -12px;">
         </div>
         {%endif%}
    

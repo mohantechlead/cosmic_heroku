@@ -188,11 +188,12 @@ class InvoiceItemForm(forms.ModelForm):
     bags = forms.DecimalField(widget=forms.TextInput(attrs={'class': 'bags form-control'}))
     net_weight = forms.DecimalField(widget=forms.TextInput(attrs={'class': 'net_weight form-control'}), label="Net weight")
     gross_weight = forms.DecimalField(widget=forms.TextInput(attrs={'class': 'gross_weight form-control'}), label="Gross weight")
+    hs_code = forms.CharField(label='HS CODE', required=False, widget=forms.TextInput(attrs={'class': 'hs_codes form-control'}))
     
     item_name = forms.ModelChoiceField(
         queryset=item_codes.objects.all(),
         empty_label="Item Name", 
-        widget=forms.Select(attrs={'class': 'form-control'}),
+        widget=forms.Select(attrs={'class': 'item_name form-control'}),
         to_field_name='item_name'
     )
     
@@ -200,7 +201,7 @@ class InvoiceItemForm(forms.ModelForm):
     class Meta:
    
         model = invoice_item
-        fields = ['item_name','price','quantity','before_vat','measurement','bags','net_weight','gross_weight']
+        fields = ['item_name','hs_code','price','quantity','before_vat','measurement','bags','net_weight','gross_weight']
 
 class restoreForm(forms.Form):
     selected_orders = forms.ModelMultipleChoiceField(

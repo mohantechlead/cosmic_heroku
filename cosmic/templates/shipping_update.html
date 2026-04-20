@@ -174,17 +174,38 @@
 </div>
 
 <div>
+    <style>
+        #item-formset-list input[type="checkbox"][name$="-DELETE"] {
+            display: none;
+        }
+    </style>
     <form method="post" action="{% url 'update_shipping' %}" id="form2">
         {% csrf_token %}
         {{formset.management_form}}
+        <div id="item-formset-list">
         {% for form in formset %}
         <div class="card-body row item-list form-group col-md-5" style="margin: 10px;">
-
+            <div style="margin-bottom: 8px;">
+                <button type="button" class="btn btn-danger remove-item-btn">Remove Item</button>
+            </div>
             {{ form }}
         </div>
         {% endfor %}
+        </div>
+        <div style="margin: 10px;">
+            <button type="button" class="btn btn-primary" id="add-item-row">Add Item</button>
+            <button type="button" class="btn btn-secondary" id="calculate-total-btn">Calculate Total Price</button>
+            <span id="total-price-display" style="margin-left: 12px; font-weight: 700; color: #1b3f7a;">Total Price: 0.00</span>
+        </div>
     </form>
-
+    <template id="empty-item-form-template">
+        <div class="card-body row item-list form-group col-md-5" style="margin: 10px;">
+            <div style="margin-bottom: 8px;">
+                <button type="button" class="btn btn-danger remove-item-btn">Remove Item</button>
+            </div>
+            {{ formset.empty_form }}
+        </div>
+    </template>
 </div>
 
 <div class="container">
@@ -205,8 +226,15 @@
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         //const radioButtons = document.querySelectorAll('input[type="radio"]');
+        const form1 = document.getElementById('form1');
+        const form2 = document.getElementById('form2');
         const radioButtons = document.querySelectorAll('.measurement_type');
         const submitButton = document.querySelector('#submits');
+        const itemFormsetList = document.getElementById('item-formset-list');
+        const addItemButton = document.getElementById('add-item-row');
+        const calculateTotalButton = document.getElementById('calculate-total-btn');
+        const totalPriceDisplay = document.getElementById('total-price-display');
+        const totalFormsInput = document.getElementById('id_form-TOTAL_FORMS');
         const radioButtons2 = document.querySelectorAll('.payment_type');
         const priceFields = document.querySelectorAll('.price');
         // const totalNewForms = document.getElementById('id_form-TOTAL_FORMS');
@@ -231,11 +259,104 @@
             updateTotalPrice(form);
         });
 
+        $(document).on('change', '.item-list .item_name', function () {
+            var form = $(this).closest('.item-list');
+            var itemId = $(this).val();
+            if (!itemId) {
+                form.find('.hs_codes').val('');
+                return;
+            }
+            fetch(`/cosmic/get_item_data/${encodeURIComponent(itemId)}/`)
+                .then(response => response.ok ? response.json() : Promise.reject(response))
+                .then(data => {
+                    form.find('.hs_codes').val(data.code || '');
+                })
+                .catch(() => {
+                    form.find('.hs_codes').val('');
+                });
+        });
+
         // Apply initial calculation for existing forms
         $('.item-list').each(function () {
             var form = $(this);
             updateTotalPrice(form);
-        }); 4
+        });
+
+        function hideAllInputs() {
+            document.querySelectorAll('[id^="input_"]').forEach(function (el) {
+                el.style.display = 'none';
+            });
+        }
+
+        window.calculateTotal = function (element) {
+            var form = $(element).closest('.item-list');
+            if (form.length) {
+                updateTotalPrice(form);
+            }
+        };
+
+        function calculateAllRows() {
+            var grandTotal = 0;
+            $('.item-list').each(function () {
+                if (this.style.display === 'none') return;
+                var row = $(this);
+                updateTotalPrice(row);
+                var rowTotal = parseFloat(row.find('.before_vat').val());
+                if (!Number.isNaN(rowTotal)) {
+                    grandTotal += rowTotal;
+                }
+            });
+            if (totalPriceDisplay) {
+                totalPriceDisplay.textContent = 'Total Price: ' + grandTotal.toFixed(2);
+            }
+        }
+
+        window.calculateTotalPrice = function () {
+            calculateAllRows();
+        };
+
+        if (calculateTotalButton) {
+            calculateTotalButton.addEventListener('click', function () {
+                calculateAllRows();
+                if (window.showToast) {
+                    window.showToast('Totals recalculated.', 'success');
+                }
+            });
+        }
+
+        function bindRemoveButton(button) {
+            button.addEventListener('click', function () {
+                const row = button.closest('.item-list');
+                const deleteInput = row.querySelector('input[type="checkbox"][name$="-DELETE"]');
+                if (deleteInput) {
+                    deleteInput.checked = true;
+                    row.style.display = 'none';
+                    return;
+                }
+                row.remove();
+            });
+        }
+
+        itemFormsetList.querySelectorAll('.remove-item-btn').forEach(bindRemoveButton);
+
+        addItemButton.addEventListener('click', function () {
+            const template = document.getElementById('empty-item-form-template');
+            const nextIndex = parseInt(totalFormsInput.value, 10);
+            const html = template.innerHTML.replace(/__prefix__/g, nextIndex);
+            const wrapper = document.createElement('div');
+            wrapper.innerHTML = html.trim();
+            const newRow = wrapper.firstElementChild;
+            itemFormsetList.appendChild(newRow);
+            totalFormsInput.value = nextIndex + 1;
+            const removeBtn = newRow.querySelector('.remove-item-btn');
+            if (removeBtn) {
+                bindRemoveButton(removeBtn);
+            }
+            calculateAllRows();
+        });
+
+        calculateAllRows();
+
         radioButtons.forEach(button => {
             button.addEventListener('change', function () {
                 // Hide all input elements
@@ -280,6 +401,9 @@
                     if (!response.ok) {
                         return response.json().then(data => {
                             const errorContainer = document.getElementById('error-container');
+                            if (!errorContainer) {
+                                throw new Error('Unable to save shipping header.');
+                            }
                             errorContainer.innerHTML = '';
                             if (data.form_errors) {
                                 const errorList = document.createElement('ul');
@@ -314,7 +438,9 @@
                     } else {
                         // Handle success or no error from the second form submission
                         // Reload the page or do any other necessary action
-                        alert("Order Edited!")
+                        if (window.showToast) {
+                            window.showToast('Shipping updated successfully.', 'success');
+                        }
                         window.location.reload();
                     }
                 })

@@ -198,38 +198,31 @@
                             <label for="">Measurement Type</label>
                             <div class="radio-group">
                                 <div>
-                                    <input type="radio" name="measurement_type" value="MT" id="MT" {% if
-                                        cosmic_order_instance.measurement_type=='MT' %} checked {% endif%}>
+                                    <input type="radio" name="measurement_type" value="MT" id="MT" {% if cosmic_order_instance.measurement_type == 'MT' %}checked{% endif %}>
                                     <label for="MT">Metric Tons</label>
                                 </div>
                                 <div>
-                                    <input type="radio" name="measurement_type" value="TONS" id="TONS" {% if
-                                        cosmic_order_instance.measurement_type=='TONS' %} checked {% endif%}>
+                                    <input type="radio" name="measurement_type" value="TONS" id="TONS" {% if cosmic_order_instance.measurement_type == 'TONS' %}checked{% endif %}>
                                     <label for="TONS">TONS</label>
                                 </div>
                                 <div>
-                                    <input type="radio" name="measurement_type" value="kgs" id="kgs" {% if
-                                        cosmic_order_instance.measurement_type=='kgs' %} checked {% endif%}>
+                                    <input type="radio" name="measurement_type" value="kgs" id="kgs" {% if cosmic_order_instance.measurement_type == 'kgs' %}checked{% endif %}>
                                     <label for="kgs">KGs</label>
                                 </div>
                                 <div>
-                                    <input type="radio" name="measurement_type" value="Meters" id="Meters" {% if
-                                        cosmic_order_instance.measurement_type=='Meters' %} checked {% endif%}>
+                                    <input type="radio" name="measurement_type" value="Meters" id="Meters" {% if cosmic_order_instance.measurement_type == 'Meters' %}checked{% endif %}>
                                     <label for="Meters">Meters</label>
                                 </div>
                                 <div>
-                                    <input type="radio" name="measurement_type" value="Ltrs" id="ltrs" {% if
-                                        cosmic_order_instance.measurement_type=='Ltrs' %} checked {% endif%}>
+                                    <input type="radio" name="measurement_type" value="Ltrs" id="ltrs" {% if cosmic_order_instance.measurement_type == 'Ltrs' %}checked{% endif %}>
                                     <label for="Ltrs">LtrS</label>
                                 </div>
                                 <div>
-                                    <input type="radio" name="measurement_type" value="PCS" id="PCS" {% if
-                                        cosmic_order_instance.measurement_type=='PCS' %} checked {% endif%}>
+                                    <input type="radio" name="measurement_type" value="PCS" id="PCS" {% if cosmic_order_instance.measurement_type == 'PCS' %}checked{% endif %}>
                                     <label for="PCS">PCS</label>
                                 </div>
                                 <div>
-                                    <input type="radio" name="measurement_type" value="spools" id="spools" {% if
-                                        cosmic_order_instance.measurement_type=='spools' %} checked {% endif%}>
+                                    <input type="radio" name="measurement_type" value="spools" id="spools" {% if cosmic_order_instance.measurement_type == 'spools' %}checked{% endif %}>
                                     <label for="spools">Spools</label>
                                 </div>
                                 <div>
@@ -244,44 +237,35 @@
                             <div class="radio-group">
                                 <div>
                                     <input type="radio" name="payment_type" value="Irrevocable LC at Sight"
-                                        id="lc-sight" {% if
-                                        cosmic_order_instance.payment_type=='Irrevocable LC at Sight' %} checked {%
-                                        endif%}>
+                                        id="lc-sight" {% if cosmic_order_instance.payment_type == 'Irrevocable LC at Sight' %}checked{% endif %}>
                                     <label for="lc-sight">Irrevocable LC at Sight</label>
                                 </div>
                                 <div>
 
-                                    <input type="radio" name="payment_type" value="Open Credit" id="open-credit" {% if
-                                        cosmic_order_instance.payment_type=='Open Credit' %} checked {% endif%}>
+                                    <input type="radio" name="payment_type" value="Open Credit" id="open-credit" {% if cosmic_order_instance.payment_type == 'Open Credit' %}checked{% endif %}>
                                     <label for="open-credit">Open Credit</label>
 
                                 </div>
 
                                 <div>
-                                    <input type="radio" name="payment_type" value="Cash Against Doc" id="cash-doc" {% if
-                                        cosmic_order_instance.payment_type=='Cash Against Doc' %} checked {% endif%}>
+                                    <input type="radio" name="payment_type" value="Cash Against Doc" id="cash-doc" {% if cosmic_order_instance.payment_type == 'Cash Against Doc' %}checked{% endif %}>
                                     <label for="cash-doc">Cash Against Doc</label>
                                 </div>
                                 <div>
                                     <input type="radio" name="payment_type" value="Telegraphic Transfer"
-                                        id="telegraphic-transfer" {% if
-                                        cosmic_order_instance.payment_type=='Telegraphic Transfer' %} checked {%
-                                        endif%}>
+                                        id="telegraphic-transfer" {% if cosmic_order_instance.payment_type == 'Telegraphic Transfer' %}checked{% endif %}>
                                     <label for="telegraphic-transfer">Telegraphic Transfer</label>
                                 </div>
                                 <div>
-                                    <input type="radio" name="payment_type" value="Confirmed LC" id="confirmed-lc" {% if
-                                        cosmic_order_instance.payment_type=='Confirmed LC' %} checked {% endif%}>
+                                    <input type="radio" name="payment_type" value="Confirmed LC" id="confirmed-lc" {% if cosmic_order_instance.payment_type == 'Confirmed LC' %}checked{% endif %}>
                                     <label for="confirmed-lc">Confirmed LC</label>
                                 </div>
                                 <div>
-                                    <input type="radio" name="payment_type" value="Deferred LC" id="deferred-lc" {% if
-                                        cosmic_order_instance.payment_type=='Deferred LC' %} checked {% endif%}>
+                                    <input type="radio" name="payment_type" value="Deferred LC" id="deferred-lc" {% if cosmic_order_instance.payment_type == 'Deferred LC' %}checked{% endif %}>
                                     <label for="deferred-lc">Deferred LC</label>
                                 </div>
                                 <div>
-                                    <input type="radio" name="payment_type" value="Franco Valuta" id="franco-valuta" {%
-                                        if cosmic_order_instance.payment_type=='Franco Valuta' %} checked {% endif%}>
+                                    <input type="radio" name="payment_type" value="Franco Valuta" id="franco-valuta" {% if cosmic_order_instance.payment_type == 'Franco Valuta' %}checked{% endif %}>
                                     <label for="franco-valuta">Franco Valuta</label>
                                 </div>
                             </div>
@@ -291,23 +275,19 @@
                             <label for="">Mode of Transport</label>
                             <div class="radio-group">
                                 <div>
-                                    <input type="radio" name="transportation" value="Sea" id="Sea" {% if
-                                        cosmic_order_instance.transportation=='Sea' %} checked {% endif %}>
+                                    <input type="radio" name="transportation" value="Sea" id="Sea" {% if cosmic_order_instance.transportation == 'Sea' %}checked{% endif %}>
                                     <label for="Sea">Sea</label>
                                 </div>
                                 <div>
-                                    <input type="radio" name="transportation" value="Air" id="Air" {% if
-                                        cosmic_order_instance.transportation=="Air" %} checked {% endif %}>
+                                    <input type="radio" name="transportation" value="Air" id="Air" {% if cosmic_order_instance.transportation == 'Air' %}checked{% endif %}>
                                     <label for="Air">Air</label>
                                 </div>
                                 <div>
-                                    <input type="radio" name="transportation" value="Truck" id="Truck" {% if
-                                        cosmic_order_instance.transportation=="Truck" %} checked {% endif %}>
+                                    <input type="radio" name="transportation" value="Truck" id="Truck" {% if cosmic_order_instance.transportation == 'Truck' %}checked{% endif %}>
                                     <label for="Truck">Truck</label>
                                 </div>
                                 <div>
-                                    <input type="radio" name="transportation" value="Train" id="Train" {% if
-                                        cosmic_order_instance.transportation=="Train" %} checked {% endif %}>
+                                    <input type="radio" name="transportation" value="Train" id="Train" {% if cosmic_order_instance.transportation == 'Train' %}checked{% endif %}>
                                     <label for="Train">Train</label>
                                 </div>
 
@@ -325,14 +305,12 @@
                         <div class="radio-group">
                             <div>
                                 <input type="radio" name="freight" value="Payable at Destination"
-                                    id="payable_at_destination" {% if
-                                    cosmic_order_instance.freight=="Payable at Destination" %} checked {% endif %}>
+                                    id="payable_at_destination" {% if cosmic_order_instance.freight == 'Payable at Destination' %}checked{% endif %}>
                                 <label for="payable_at_destination">Payable at Destination</label>
                             </div>
 
                             <div>
-                                <input type="radio" name="freight" value="Pre-paid" id="pre_paid" {% if
-                                    cosmic_order_instance.freight=="Pre-paid" %} checked {% endif %}>
+                                <input type="radio" name="freight" value="Pre-paid" id="pre_paid" {% if cosmic_order_instance.freight == 'Pre-paid' %}checked{% endif %}>
                                 <label for="pre_paid">Pre-paid</label>
                             </div>
 
@@ -342,28 +320,23 @@
                         <label for="">Shipment Type</label>
                         <div class="radio-group">
                             <div>
-                                <input type="radio" name="shipment_type" value="FOB" id="fob" {% if
-                                    cosmic_order_instance.shipment_type=="FOB" %} checked {% endif %}>
+                                <input type="radio" name="shipment_type" value="FOB" id="fob" {% if cosmic_order_instance.shipment_type == 'FOB' %}checked{% endif %}>
                                 <label for="fob">FOB</label>
                             </div>
                             <div>
-                                <input type="radio" name="shipment_type" value="CFR" id="cfr" {% if
-                                    cosmic_order_instance.shipment_type=="CFR" %} checked {% endif %}>
+                                <input type="radio" name="shipment_type" value="CFR" id="cfr" {% if cosmic_order_instance.shipment_type == 'CFR' %}checked{% endif %}>
                                 <label for="cfr">CFR</label>
                             </div>
                             <div>
-                                <input type="radio" name="shipment_type" value="FCA" id="fca" {% if
-                                    cosmic_order_instance.shipment_type=="FCA" %} checked {% endif %}>
+                                <input type="radio" name="shipment_type" value="FCA" id="fca" {% if cosmic_order_instance.shipment_type == 'FCA' %}checked{% endif %}>
                                 <label for="fca">FCA</label>
                             </div>
                             <div>
-                                <input type="radio" name="shipment_type" value="CIF" id="cif" {% if
-                                    cosmic_order_instance.shipment_type=="CIF" %} checked {% endif %}>
+                                <input type="radio" name="shipment_type" value="CIF" id="cif" {% if cosmic_order_instance.shipment_type == 'CIF' %}checked{% endif %}>
                                 <label for="cif">CIF</label>
                             </div>
                             <div>
-                                <input type="radio" name="shipment_type" value="air_freight" id="air_freight" {% if
-                                    cosmic_order_instance.shipment_type=="air_freight" %} checked {% endif %}>
+                                <input type="radio" name="shipment_type" value="air_freight" id="air_freight" {% if cosmic_order_instance.shipment_type == 'air_freight' %}checked{% endif %}>
                                 <label for="air_freight">Air Freight</label>
                             </div>
 
@@ -425,11 +398,18 @@
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         //const radioButtons = document.querySelectorAll('input[type="radio"]');
+        const form1 = document.getElementById('form1');
         const radioButtons = document.querySelectorAll('.measurement_type');
         const submitButton = document.querySelector('#submits');
         const radioButtons2 = document.querySelectorAll('.payment_type');
 
         console.log("try")
+
+        function hideAllInputs() {
+            document.querySelectorAll('[id^="input_"]').forEach(function (el) {
+                el.style.display = 'none';
+            });
+        }
 
         radioButtons.forEach(button => {
             button.addEventListener('change', function () {
@@ -482,7 +462,9 @@
                         });
                     }
                     else {
-                        alert("Order Edited!")
+                        if (window.showToast) {
+                            window.showToast('Order edited successfully.', 'success');
+                        }
                         window.location.reload();
                     }
                 })
