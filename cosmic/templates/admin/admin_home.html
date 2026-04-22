@@ -4,50 +4,171 @@
 
 {% block content %}
 <style>
-    .admin-home-grid {
+    .admin-dashboard {
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+    }
+
+    .admin-dashboard h2 {
+        margin: 0;
+        color: #1a3e74;
+        font-weight: 700;
+    }
+
+    .admin-section-card {
+        background: #ffffff;
+        border: 1px solid #dde7f8;
+        border-radius: 12px;
+        padding: 16px;
+    }
+
+    .admin-section-title {
+        margin: 0 0 12px;
+        color: #294774;
+        font-size: 17px;
+        font-weight: 700;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 12px;
+    }
+
+    .stat-card {
+        background: linear-gradient(135deg, #f5f9ff 0%, #e9f1ff 100%);
+        border: 1px solid #d5e3fb;
+        border-radius: 10px;
+        padding: 12px;
+    }
+
+    .stat-value {
+        margin: 0;
+        font-size: 28px;
+        line-height: 1;
+        color: #163f79;
+        font-weight: 700;
+    }
+
+    .stat-label {
+        margin: 6px 0 0;
+        font-size: 12px;
+        color: #4f678f;
+        line-height: 1.4;
+    }
+
+    .status-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+    }
+
+    .status-card {
+        border: 1px solid #dbe7fb;
+        border-radius: 10px;
+        padding: 12px;
+        background: #fdfefe;
+    }
+
+    .status-card h4 {
+        margin: 0 0 10px;
+        color: #274b81;
+        font-weight: 700;
+    }
+
+    .status-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 6px 0;
+        border-top: 1px solid #edf3ff;
+    }
+
+    .status-row:first-of-type {
+        border-top: 0;
+        padding-top: 0;
+    }
+
+    .status-label {
+        color: #4a6084;
+        font-size: 13px;
+    }
+
+    .status-value {
+        color: #163f79;
+        font-weight: 700;
+        font-size: 14px;
+    }
+
+    .quick-access-columns {
         display: grid;
         grid-template-columns: repeat(3, minmax(0, 1fr));
         gap: 14px;
     }
 
-    .admin-home-card {
+    .quick-access-group {
+        border: 1px solid #dce8fb;
+        border-radius: 10px;
+        padding: 12px;
+        background: #fcfdff;
+    }
+
+    .quick-access-group h4 {
+        margin: 0 0 10px;
+        color: #1d447e;
+        font-weight: 700;
+    }
+
+    .quick-links-grid {
+        display: grid;
+        gap: 10px;
+    }
+
+    .quick-link-card {
         display: block;
         background: #ffffff;
-        border: 1px solid #dde7f8;
-        border-radius: 12px;
-        padding: 14px;
+        border: 1px solid #e1ebfb;
+        border-radius: 10px;
+        padding: 12px;
         color: #24406e;
         text-decoration: none;
         transition: transform 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease;
     }
 
-    .admin-home-card h4 {
+    .quick-link-card h5 {
         margin: 0 0 6px;
         color: #1a3e74;
         font-weight: 700;
+        font-size: 14px;
     }
 
-    .admin-home-card p {
+    .quick-link-card p {
         margin: 0;
         color: #46608a;
-        font-size: 13px;
+        font-size: 12px;
         line-height: 1.45;
     }
 
-    .admin-home-card:hover {
+    .quick-link-card:hover {
         transform: translateY(-2px);
         border-color: #bcd3f6;
-        box-shadow: 0 14px 24px rgba(28, 74, 150, 0.15);
+        box-shadow: 0 10px 20px rgba(28, 74, 150, 0.14);
     }
 
     @media (max-width: 1024px) {
-        .admin-home-grid {
+        .stats-grid {
             grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .quick-access-columns {
+            grid-template-columns: 1fr;
         }
     }
 
     @media (max-width: 640px) {
-        .admin-home-grid {
+        .stats-grid,
+        .status-grid {
             grid-template-columns: 1fr;
         }
     }
@@ -58,13 +179,82 @@
         <h2>Admin Dashboard</h2>
     </div>
     <div class="admin-workspace-body">
-        <div class="admin-home-grid">
-            {% for link in admin_links %}
-            <a class="admin-home-card" href="{% url link.url %}">
-                <h4>{{ link.title }}</h4>
-                <p>{{ link.desc }}</p>
-            </a>
-            {% endfor %}
+        <div class="admin-dashboard">
+            <section class="admin-section-card">
+                <h3 class="admin-section-title"> </h3>
+                <div class="stats-grid">
+                    {% for stat in dashboard_stats %}
+                    <article class="stat-card">
+                        <p class="stat-value">{{ stat.value }}</p>
+                        <p class="stat-label">{{ stat.label }}</p>
+                    </article>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <section class="admin-section-card">
+                <h3 class="admin-section-title">Status Summary</h3>
+                <div class="status-grid">
+                    <article class="status-card">
+                        <h4>Sales Orders</h4>
+                        <div class="status-row">
+                            <span class="status-label">Pending</span>
+                            <span class="status-value">{{ order_status_counts.pending }}</span>
+                        </div>
+                        <div class="status-row">
+                            <span class="status-label">Approved</span>
+                            <span class="status-value">{{ order_status_counts.approved }}</span>
+                        </div>
+                        <div class="status-row">
+                            <span class="status-label">Rejected</span>
+                            <span class="status-value">{{ order_status_counts.rejected }}</span>
+                        </div>
+                        <div class="status-row">
+                            <span class="status-label">Completed</span>
+                            <span class="status-value">{{ order_status_counts.complete }}</span>
+                        </div>
+                    </article>
+
+                    <article class="status-card">
+                        <h4>Purchases</h4>
+                        <div class="status-row">
+                            <span class="status-label">Pending</span>
+                            <span class="status-value">{{ purchase_status_counts.pending }}</span>
+                        </div>
+                        <div class="status-row">
+                            <span class="status-label">Approved</span>
+                            <span class="status-value">{{ purchase_status_counts.approved }}</span>
+                        </div>
+                        <div class="status-row">
+                            <span class="status-label">Rejected</span>
+                            <span class="status-value">{{ purchase_status_counts.rejected }}</span>
+                        </div>
+                        <div class="status-row">
+                            <span class="status-label">Received</span>
+                            <span class="status-value">{{ purchase_status_counts.received }}</span>
+                        </div>
+                    </article>
+                </div>
+            </section>
+
+            <section class="admin-section-card">
+                <h3 class="admin-section-title">Quick Access</h3>
+                <div class="quick-access-columns">
+                    {% for section in quick_access_sections %}
+                    <article class="quick-access-group">
+                        <h4>{{ section.title }}</h4>
+                        <div class="quick-links-grid">
+                            {% for link in section.links %}
+                            <a class="quick-link-card" href="{% url link.url %}">
+                                <h5>{{ link.title }}</h5>
+                                <p>{{ link.desc }}</p>
+                            </a>
+                            {% endfor %}
+                        </div>
+                    </article>
+                    {% endfor %}
+                </div>
+            </section>
         </div>
     </div>
 </div>

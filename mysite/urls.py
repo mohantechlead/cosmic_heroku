@@ -21,6 +21,7 @@ from django.shortcuts import redirect
 
 urlpatterns = [
     path('', lambda request: redirect('create_orders')),
+    path('logout/', cosmic_views.logout_user, name='logout'),
     path('admin/', cosmic_views.admin_home, name='admin_home'),
     path('admin/', admin.site.urls),
     path('cosmic/', include('cosmic.urls')),

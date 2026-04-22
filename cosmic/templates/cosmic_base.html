@@ -178,6 +178,18 @@
             transition: all 0.3s;
         }
 
+        #sidebar .components {
+            min-height: calc(100vh - 120px);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-logout-item {
+            margin-top: auto;
+            border-top: 1px solid rgba(255, 255, 255, 0.25);
+            padding-top: 8px;
+        }
+
         nav .navbar {
             background-color: #563C16;
             color: #fff;
@@ -306,6 +318,13 @@
             {% with current=request.resolver_match.url_name %}
             <ul class="list-unstyled components">
                 <br>
+                {% if request.user.is_authenticated and request.user.is_staff %}
+                <li style="font-size:larger; font-weight: 500;">
+                    <a class="{% if current == 'admin_home' %}active-nav-item{% endif %}" href="{% url 'admin_home' %}">
+                        <i class="fas fa-tachometer-alt"></i> Admin Dashboard
+                    </a>
+                </li>
+                {% endif %}
                 <li class="nav-section-active" style="font-size:larger; font-weight: 500;">
                     <a href="#approvalSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle"><i class="fas fa-check-circle"></i> Approvals</a>
                     <ul class="collapse list-unstyled {% if current == 'order_approval' or current == 'order_status' or current == 'rejected_orders' or current == 'purchase_approval' or current == 'purchase_status' or current == 'completed_orders' %}in{% endif %}" id="approvalSubmenu">
@@ -364,6 +383,11 @@
                 <li style="font-size:larger; font-weight: 500;">
                     <a class="{% if current == 'completed_orders' %}active-nav-item{% endif %}" href="{% url 'completed_orders' %}"><i class="fas fa-check-double"></i> Completed Orders</a>
                 </li>
+                {% if request.user.is_authenticated %}
+                <li class="sidebar-logout-item" style="font-size:larger; font-weight: 500;">
+                    <a href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                </li>
+                {% endif %}
             </ul>
             {% endwith %}
 

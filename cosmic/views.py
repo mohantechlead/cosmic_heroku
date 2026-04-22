@@ -9,6 +9,7 @@ from django.db.utils import ProgrammingError, OperationalError
 from django.http import JsonResponse,HttpResponse
 from django.template.loader import get_template
 from django.contrib.auth.models import User, auth
+from django.contrib.auth import logout as django_logout
 from num2words import num2words
 from django.contrib import messages
 
@@ -19,17 +20,78 @@ def is_admin(user):
     return user.is_staff
 
 @login_required
+def logout_user(request):
+    django_logout(request)
+    return redirect('/admin/login/')
+
+@login_required
 @user_passes_test(is_admin)
 def admin_home(request):
+    def safe_count(queryset):
+        try:
+            return queryset.count()
+        except (ProgrammingError, OperationalError):
+            return 0
+
+    dashboard_stats = [
+        {'label': 'Total Customers', 'value': safe_count(customer_profile.objects.all())},
+        {'label': 'Total Suppliers', 'value': safe_count(supplier_profile.objects.all())},
+        {'label': 'Total Sales Orders', 'value': safe_count(cosmic_order.objects.all())},
+        {'label': 'Total Purchases', 'value': safe_count(cosmic_purchase.objects.all())},
+        {'label': 'Total GRNs', 'value': safe_count(cosmic_grn.objects.all())},
+        {'label': 'Total Delivery Notes', 'value': safe_count(cosmic_delivery.objects.all())},
+        {'label': 'Total Shipping Invoices', 'value': safe_count(shipping_info.objects.all())},
+        {'label': 'Total Items', 'value': safe_count(item_codes.objects.all())},
+    ]
+
+    order_status_counts = {
+        'pending': safe_count(cosmic_order.objects.filter(status__iexact='pending')),
+        'approved': safe_count(cosmic_order.objects.filter(status__iexact='approved')),
+        'rejected': safe_count(cosmic_order.objects.filter(status__iexact='rejected')),
+        'complete': safe_count(cosmic_order.objects.filter(status__iexact='complete')),
+    }
+
+    purchase_status_counts = {
+        'pending': safe_count(cosmic_purchase.objects.filter(status__iexact='pending')),
+        'approved': safe_count(cosmic_purchase.objects.filter(status__iexact='approved')),
+        'rejected': safe_count(cosmic_purchase.objects.filter(status__iexact='rejected')),
+        'received': safe_count(cosmic_purchase.objects.filter(status__iexact='received')),
+    }
+
     context = {
-        'admin_links': [
-            {'title': 'Order Approval', 'desc': 'Approve or reject new orders.', 'url': 'order_approval'},
-            {'title': 'Order Status', 'desc': 'Update ongoing order statuses.', 'url': 'order_status'},
-            {'title': 'Purchase Approval', 'desc': 'Approve or reject purchase entries.', 'url': 'purchase_approval'},
-            {'title': 'Purchase Status', 'desc': 'Track purchase progress and remarks.', 'url': 'purchase_status'},
-            {'title': 'Rejected Orders', 'desc': 'Restore or delete rejected records.', 'url': 'rejected_orders'},
-            {'title': 'Completed Orders', 'desc': 'Review completed order records.', 'url': 'completed_orders'},
-        ]
+        'dashboard_stats': dashboard_stats,
+        'order_status_counts': order_status_counts,
+        'purchase_status_counts': purchase_status_counts,
+        'quick_access_sections': [
+            {
+                'title': 'Approvals & Workflow',
+                'links': [
+                    {'title': 'Order Approval', 'desc': 'Approve or reject new sales orders.', 'url': 'order_approval'},
+                    {'title': 'Order Status', 'desc': 'Update ongoing sales order statuses.', 'url': 'order_status'},
+                    {'title': 'Purchase Approval', 'desc': 'Approve or reject purchase entries.', 'url': 'purchase_approval'},
+                    {'title': 'Purchase Status', 'desc': 'Track purchase progress and remarks.', 'url': 'purchase_status'},
+                    {'title': 'Rejected Orders', 'desc': 'Restore or permanently remove rejected orders.', 'url': 'rejected_orders'},
+                    {'title': 'Completed Orders', 'desc': 'Review fully completed sales orders.', 'url': 'completed_orders'},
+                ],
+            },
+            {
+                'title': 'Master Data',
+                'links': [
+                    {'title': 'Customers', 'desc': 'Create and manage customer records.', 'url': 'display_customers'},
+                    {'title': 'Suppliers', 'desc': 'Create and manage supplier records.', 'url': 'display_supplier'},
+                    {'title': 'Items', 'desc': 'Maintain product codes and item details.', 'url': 'display_items'},
+                ],
+            },
+            {
+                'title': 'Operations',
+                'links': [
+                    {'title': 'Sales Orders', 'desc': 'View and manage all sales orders.', 'url': 'display_order'},
+                    {'title': 'Purchases', 'desc': 'View and manage all purchase orders.', 'url': 'display_purchase'},
+                    {'title': 'GRN Records', 'desc': 'Review goods received note entries.', 'url': 'display_grn'},
+                    {'title': 'Delivery Notes', 'desc': 'Review outbound delivery records.', 'url': 'display_dn'},
+                ],
+            },
+        ],
     }
     return render(request, 'admin/admin_home.html', context)
 
