@@ -156,12 +156,44 @@
         box-shadow: 0 10px 20px rgba(28, 74, 150, 0.14);
     }
 
+    .charts-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+    }
+
+    .chart-card {
+        border: 1px solid #e1ebfb;
+        border-radius: 10px;
+        padding: 12px;
+        background: #ffffff;
+    }
+
+    .chart-card h4 {
+        margin: 0 0 8px;
+        color: #1d447e;
+        font-weight: 700;
+    }
+
+    .chart-holder {
+        position: relative;
+        height: 320px;
+    }
+
+    .full-width {
+        grid-column: 1 / -1;
+    }
+
     @media (max-width: 1024px) {
         .stats-grid {
             grid-template-columns: repeat(2, minmax(0, 1fr));
         }
 
         .quick-access-columns {
+            grid-template-columns: 1fr;
+        }
+
+        .charts-grid {
             grid-template-columns: 1fr;
         }
     }
@@ -180,8 +212,9 @@
     </div>
     <div class="admin-workspace-body">
         <div class="admin-dashboard">
+            {% if not show_analytics %}
             <section class="admin-section-card">
-                <h3 class="admin-section-title"> </h3>
+                <h3 class="admin-section-title">Business Snapshot</h3>
                 <div class="stats-grid">
                     {% for stat in dashboard_stats %}
                     <article class="stat-card">
@@ -255,7 +288,248 @@
                     {% endfor %}
                 </div>
             </section>
+            {% endif %}
+
+            {% if show_analytics %}
+            <section class="admin-section-card">
+                <h3 class="admin-section-title">Analytics</h3>
+                <div class="charts-grid" style="margin-bottom: 12px;">
+                    <article class="chart-card">
+                        <h4>Entity</h4>
+                        <select id="entityFilter" class="form-control">
+                            <option value="sales">Sales Orders</option>
+                            <option value="purchases">Purchases</option>
+                            <option value="grn">Inventory - GRN</option>
+                            <option value="dn">Inventory - DN</option>
+                            <option value="shippingInvoices">Shipping Invoices</option>
+                        </select>
+                    </article>
+                    <article class="chart-card">
+                        <h4>Period</h4>
+                        <select id="granularityFilter" class="form-control">
+                            <option value="daily">Daily</option>
+                            <option value="monthly" selected>Monthly</option>
+                            <option value="yearly">Yearly</option>
+                        </select>
+                    </article>
+                    <article class="chart-card">
+                        <h4>Metric</h4>
+                        <select id="metricFilter" class="form-control">
+                            <option value="amount" selected>Amount</option>
+                            <option value="quantity">Quantity</option>
+                            <option value="count">Count</option>
+                        </select>
+                    </article>
+                    <article class="chart-card">
+                        <h4>View</h4>
+                        <select id="viewModeFilter" class="form-control"></select>
+                    </article>
+                    <article class="chart-card">
+                        <h4>From Date</h4>
+                        <input id="dateFromFilter" type="date" class="form-control" />
+                    </article>
+                    <article class="chart-card">
+                        <h4>To Date</h4>
+                        <input id="dateToFilter" type="date" class="form-control" />
+                    </article>
+                </div>
+                <div class="charts-grid">
+                    <article class="chart-card">
+                        <h4>Order & Purchase Trend (Line)</h4>
+                        <div class="chart-holder">
+                            <canvas id="lineChart"></canvas>
+                        </div>
+                    </article>
+                    <article class="chart-card">
+                        <h4>Order & Purchase Trend (Bar)</h4>
+                        <div class="chart-holder">
+                            <canvas id="barChart"></canvas>
+                        </div>
+                    </article>
+                    <article class="chart-card full-width">
+                        <h4>Status Distribution (Pie)</h4>
+                        <div class="chart-holder">
+                            <canvas id="pieChart"></canvas>
+                        </div>
+                    </article>
+                </div>
+            </section>
+            {% endif %}
         </div>
     </div>
 </div>
+{% if show_analytics %}
+{{ analytics_rows|json_script:"analytics-rows" }}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    (function () {
+        const analyticsRows = JSON.parse(document.getElementById("analytics-rows").textContent || "{}");
+        const palette = ["#2563eb", "#16a34a", "#ea580c", "#7c3aed", "#db2777", "#0891b2"];
+        const entityFilter = document.getElementById("entityFilter");
+        const granularityFilter = document.getElementById("granularityFilter");
+        const metricFilter = document.getElementById("metricFilter");
+        const viewModeFilter = document.getElementById("viewModeFilter");
+        const dateFromFilter = document.getElementById("dateFromFilter");
+        const dateToFilter = document.getElementById("dateToFilter");
+
+        const lineCtx = document.getElementById("lineChart");
+        const barCtx = document.getElementById("barChart");
+        const pieCtx = document.getElementById("pieChart");
+        let lineChart = null;
+        let barChart = null;
+        let pieChart = null;
+
+        const viewOptionsByEntity = {
+            sales: [["total", "Total"], ["item", "Per Item"], ["shipper", "Per Shipper"], ["buyer", "Per Buyer"], ["status", "Per Status"], ["measurementType", "Per Measurement Type"], ["paymentTerms", "Per Payment Terms"], ["modeOfTransport", "Per Mode of Transport"], ["freight", "Per Freight"], ["shipmentType", "Per Shipment Type"]],
+            purchases: [["total", "Total"], ["item", "Per Item"], ["supplier", "Per Supplier"], ["customer", "Per Customer"], ["status", "Per Status"], ["measurementType", "Per Measurement Type"], ["paymentTerms", "Per Payment Terms"], ["modeOfTransport", "Per Mode of Transport"], ["freight", "Per Freight"], ["shipmentType", "Per Shipment Type"]],
+            grn: [["total", "Total"], ["item", "Per Item"], ["supplier", "Per Supplier"]],
+            dn: [["total", "Total"], ["customer", "Per Customer"], ["reference", "Per DN Number"]],
+            shippingInvoices: [["total", "Total"], ["reference", "Per Invoice Number"], ["customer", "Per Order Number"], ["status", "Per Status"]],
+        };
+
+        function toPeriodKey(value, granularity) {
+            if (!value) return "";
+            const d = new Date(value);
+            if (Number.isNaN(d.getTime())) return "";
+            const y = d.getUTCFullYear();
+            const m = String(d.getUTCMonth() + 1).padStart(2, "0");
+            const day = String(d.getUTCDate()).padStart(2, "0");
+            if (granularity === "yearly") return String(y);
+            if (granularity === "monthly") return y + "-" + m;
+            return y + "-" + m + "-" + day;
+        }
+
+        function getBaseValue(row, metric) {
+            if (metric === "count") return 1;
+            if (metric === "quantity") return Number(row.quantity || 0);
+            return Number(row.amount || 0);
+        }
+
+        function refreshViewOptions() {
+            const entity = entityFilter.value;
+            const options = viewOptionsByEntity[entity] || [["total", "Total"]];
+            const previous = viewModeFilter.value;
+            viewModeFilter.innerHTML = "";
+            options.forEach(function (entry) {
+                const option = document.createElement("option");
+                option.value = entry[0];
+                option.textContent = entry[1];
+                viewModeFilter.appendChild(option);
+            });
+            const stillExists = options.some(function (entry) { return entry[0] === previous; });
+            viewModeFilter.value = stillExists ? previous : "total";
+        }
+
+        function buildChartData() {
+            const entity = entityFilter.value;
+            const granularity = granularityFilter.value;
+            const metric = metricFilter.value;
+            const viewMode = viewModeFilter.value || "total";
+            const dateFrom = dateFromFilter.value || "";
+            const dateTo = dateToFilter.value || "";
+            const rows = Array.isArray(analyticsRows[entity]) ? analyticsRows[entity] : [];
+
+            const filtered = rows.filter(function (row) {
+                const date = row.date || "";
+                if (!date) return false;
+                if (dateFrom && date < dateFrom) return false;
+                if (dateTo && date > dateTo) return false;
+                return true;
+            });
+
+            if (viewMode === "total") {
+                const map = {};
+                filtered.forEach(function (row) {
+                    const period = toPeriodKey(row.date, granularity);
+                    if (!period) return;
+                    map[period] = (map[period] || 0) + getBaseValue(row, metric);
+                });
+                const labels = Object.keys(map).sort();
+                const values = labels.map(function (k) { return map[k]; });
+                return {
+                    labels: labels,
+                    series: [{ label: "Actual", key: "actual", data: values, color: palette[0] }],
+                };
+            }
+
+            const groupTotals = {};
+            filtered.forEach(function (row) {
+                const groupKey = row[viewMode] || "Unknown";
+                groupTotals[groupKey] = (groupTotals[groupKey] || 0) + getBaseValue(row, metric);
+            });
+            const topGroups = Object.keys(groupTotals).sort(function (a, b) { return groupTotals[b] - groupTotals[a]; }).slice(0, 5);
+            const byPeriod = {};
+            filtered.forEach(function (row) {
+                const period = toPeriodKey(row.date, granularity);
+                if (!period) return;
+                const groupKey = row[viewMode] || "Unknown";
+                if (topGroups.indexOf(groupKey) === -1) return;
+                byPeriod[period] = byPeriod[period] || {};
+                byPeriod[period][groupKey] = (byPeriod[period][groupKey] || 0) + getBaseValue(row, metric);
+            });
+            const labels = Object.keys(byPeriod).sort();
+            const series = topGroups.map(function (group, index) {
+                return {
+                    label: group,
+                    key: group,
+                    color: palette[index % palette.length],
+                    data: labels.map(function (period) { return (byPeriod[period] && byPeriod[period][group]) || 0; }),
+                };
+            });
+            return { labels: labels, series: series };
+        }
+
+        function renderCharts() {
+            const model = buildChartData();
+            if (lineChart) lineChart.destroy();
+            if (barChart) barChart.destroy();
+            if (pieChart) pieChart.destroy();
+
+            lineChart = new Chart(lineCtx, {
+                type: "line",
+                data: {
+                    labels: model.labels,
+                    datasets: model.series.map(function (s) {
+                        return { label: s.label, data: s.data, borderColor: s.color, backgroundColor: s.color + "33", tension: 0.3 };
+                    }),
+                },
+                options: { responsive: true, maintainAspectRatio: false },
+            });
+
+            barChart = new Chart(barCtx, {
+                type: "bar",
+                data: {
+                    labels: model.labels,
+                    datasets: model.series.map(function (s) {
+                        return { label: s.label, data: s.data, backgroundColor: s.color };
+                    }),
+                },
+                options: { responsive: true, maintainAspectRatio: false },
+            });
+
+            const pieLabels = model.series.map(function (s) { return s.label; });
+            const pieValues = model.series.map(function (s) {
+                return s.data.reduce(function (sum, v) { return sum + v; }, 0);
+            });
+            pieChart = new Chart(pieCtx, {
+                type: "pie",
+                data: {
+                    labels: pieLabels,
+                    datasets: [{ data: pieValues, backgroundColor: model.series.map(function (s) { return s.color; }) }],
+                },
+                options: { responsive: true, maintainAspectRatio: false },
+            });
+        }
+
+        refreshViewOptions();
+        renderCharts();
+        [entityFilter, granularityFilter, metricFilter, viewModeFilter, dateFromFilter, dateToFilter].forEach(function (el) {
+            el.addEventListener("change", function () {
+                if (el === entityFilter) refreshViewOptions();
+                renderCharts();
+            });
+        });
+    })();
+</script>
+{% endif %}
 {% endblock %}

@@ -14,6 +14,7 @@ from num2words import num2words
 from django.contrib import messages
 
 import os
+from collections import defaultdict
 # Create your views here.
 
 def is_admin(user):
@@ -27,11 +28,19 @@ def logout_user(request):
 @login_required
 @user_passes_test(is_admin)
 def admin_home(request):
+    show_analytics = request.GET.get('analytics') == '1'
+
     def safe_count(queryset):
         try:
             return queryset.count()
         except (ProgrammingError, OperationalError):
             return 0
+
+    def safe_iter(queryset):
+        try:
+            return list(queryset)
+        except (ProgrammingError, OperationalError):
+            return []
 
     dashboard_stats = [
         {'label': 'Total Customers', 'value': safe_count(customer_profile.objects.all())},
@@ -58,10 +67,98 @@ def admin_home(request):
         'received': safe_count(cosmic_purchase.objects.filter(status__iexact='received')),
     }
 
+    analytics_rows = {
+        'sales': [],
+        'purchases': [],
+        'grn': [],
+        'dn': [],
+        'shippingInvoices': [],
+    }
+
+    if show_analytics:
+        orders = safe_iter(cosmic_order.objects.all())
+        for order in orders:
+            order_items = safe_iter(order_item.objects.filter(order_no=order.order_no))
+            for item in order_items:
+                analytics_rows['sales'].append({
+                    'date': order.date.isoformat() if order.date else '',
+                    'reference': order.order_no or '',
+                    'item': item.item_name or '',
+                    'shipper': str(order.supplier_name) if order.supplier_name else '',
+                    'buyer': str(order.customer_name) if order.customer_name else '',
+                    'status': order.status or '',
+                    'measurementType': order.measurement_type or '',
+                    'paymentTerms': order.payment_type or '',
+                    'modeOfTransport': order.transportation or '',
+                    'freight': order.freight or '',
+                    'shipmentType': order.shipment_type or '',
+                    'amount': float(item.before_vat or 0),
+                    'quantity': float(item.quantity or 0),
+                })
+
+        purchases = safe_iter(cosmic_purchase.objects.all())
+        for purchase in purchases:
+            purchase_items = safe_iter(purchase_item.objects.filter(purchase_no=purchase.purchase_no))
+            for item in purchase_items:
+                analytics_rows['purchases'].append({
+                    'date': purchase.date.isoformat() if purchase.date else '',
+                    'reference': purchase.purchase_no or '',
+                    'item': item.item_name or '',
+                    'supplier': str(purchase.supplier_name) if purchase.supplier_name else '',
+                    'customer': str(purchase.customer_name) if purchase.customer_name else '',
+                    'status': purchase.status or '',
+                    'measurementType': purchase.measurement_type or '',
+                    'paymentTerms': purchase.payment_type or '',
+                    'modeOfTransport': purchase.transportation or '',
+                    'freight': purchase.freight or '',
+                    'shipmentType': purchase.shipment_type or '',
+                    'amount': float(item.before_vat or 0),
+                    'quantity': float(item.quantity or 0),
+                })
+
+        grns = safe_iter(cosmic_grn.objects.all())
+        for grn in grns:
+            grn_items = safe_iter(cosmic_grnitem.objects.filter(GRN_no=grn))
+            for item in grn_items:
+                analytics_rows['grn'].append({
+                    'date': grn.grn_date.isoformat() if grn.grn_date else '',
+                    'reference': grn.GRN_no or '',
+                    'item': item.item_name or '',
+                    'supplier': grn.recieved_from or '',
+                    'measurementType': '',
+                    'amount': float(item.quantity or 0),
+                    'quantity': float(item.quantity or 0),
+                })
+
+        dns = safe_iter(cosmic_delivery.objects.all())
+        for dn in dns:
+            analytics_rows['dn'].append({
+                'date': dn.delivery_date.isoformat() if dn.delivery_date else '',
+                'reference': str(dn.delivery_number),
+                'item': '',
+                'customer': dn.recipient_name or '',
+                'measurementType': '',
+                'amount': float(dn.delivery_quantity or 0),
+                'quantity': float(dn.delivery_quantity or 0),
+            })
+
+        invoices = safe_iter(shipping_info.objects.all())
+        for inv in invoices:
+            analytics_rows['shippingInvoices'].append({
+                'date': inv.invoice_date.isoformat() if inv.invoice_date else '',
+                'reference': inv.invoice_num or '',
+                'customer': inv.order_no.order_no if inv.order_no else '',
+                'status': 'authorized' if (inv.invoice_remark or '').strip() else 'pending',
+                'amount': float(inv.final_price or 0),
+                'quantity': 1,
+            })
+
     context = {
         'dashboard_stats': dashboard_stats,
         'order_status_counts': order_status_counts,
         'purchase_status_counts': purchase_status_counts,
+        'show_analytics': show_analytics,
+        'analytics_rows': analytics_rows,
         'quick_access_sections': [
             {
                 'title': 'Approvals & Workflow',

@@ -12,6 +12,9 @@ class customer_profile(models.Model):
     comments = models.TextField(blank=True, null=True)
     date = models.DateTimeField(auto_now_add=True, blank=True)
 
+    def __str__(self):
+        return self.customer_name or "Customer"
+
 class supplier_profile(models.Model):
     #supplier_id = models.AutoField(primary_key=True)
     supplier_name = models.TextField(primary_key=True)
@@ -21,6 +24,9 @@ class supplier_profile(models.Model):
     email = models.TextField(blank=True, null=True)
     comments = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True, blank=True)
+
+    def __str__(self):
+        return self.supplier_name or "Supplier"
 
 class cosmic_order(models.Model):
     customer_name = models.ForeignKey('customer_profile', related_name='orders_related_to_customer',on_delete=models.CASCADE, db_column='customer_name',blank=False, null=True)

@@ -319,10 +319,22 @@
             <ul class="list-unstyled components">
                 <br>
                 {% if request.user.is_authenticated and request.user.is_staff %}
-                <li style="font-size:larger; font-weight: 500;">
-                    <a class="{% if current == 'admin_home' %}active-nav-item{% endif %}" href="{% url 'admin_home' %}">
-                        <i class="fas fa-tachometer-alt"></i> Admin Dashboard
+                <li class="nav-section-active" style="font-size:larger; font-weight: 500;">
+                    <a href="#dashboardSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">
+                        <i class="fas fa-tachometer-alt"></i> Dashboard
                     </a>
+                    <ul class="collapse list-unstyled {% if current == 'admin_home' %}in{% endif %}" id="dashboardSubmenu">
+                        <li style="font-size: large;">
+                            <a class="{% if current == 'admin_home' and request.GET.analytics != '1' %}active-nav-item{% endif %}" href="{% url 'admin_home' %}">
+                                <i class="fas fa-tachometer-alt"></i> Admin Dashboard
+                            </a>
+                        </li>
+                        <li style="font-size: large;">
+                            <a class="{% if current == 'admin_home' and request.GET.analytics == '1' %}active-nav-item{% endif %}" href="{% url 'admin_home' %}?analytics=1">
+                                <i class="fas fa-chart-pie"></i> Analytics
+                            </a>
+                        </li>
+                    </ul>
                 </li>
                 {% endif %}
                 <li class="nav-section-active" style="font-size:larger; font-weight: 500;">
@@ -405,6 +417,16 @@
                         <i class="fas fa-align-left"></i>
                         <span style="color: white;">Collapse</span>
                     </button>
+                    
+                    {% if not request.user.is_authenticated or not request.user.is_staff %}
+                    <a
+                        href="/admin/login/"
+                        class="btn btn-sm"
+                        style="margin-left: 12px; background-color: rgba(255,255,255,0.18); border: 1px solid rgba(255,255,255,0.35); color: #fff;"
+                    >
+                        <i class="fas fa-user-shield"></i> Admin Login
+                    </a>
+                    {% endif %}
 
                 </div>
             </nav>
