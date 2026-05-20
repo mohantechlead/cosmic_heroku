@@ -47,6 +47,7 @@ urlpatterns = [
     path('update_order', views.update_order, name='update_order'),
     path('update_purchase', views.update_purchase, name='update_purchase'),
     path('update_shipping', views.update_shipping, name='update_shipping'),
+    path('delete_shipping_invoice', views.delete_shipping_invoice, name='delete_shipping_invoice'),
     path('edit_shipping', views.edit_shipping, name='edit_shipping'),
     path('create_orders', views.create_orders, name='create_orders'),
     path('completed_orders', views.completed_orders, name='completed_orders'),

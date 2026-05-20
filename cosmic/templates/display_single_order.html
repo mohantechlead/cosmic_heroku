@@ -92,10 +92,22 @@
                     <a href="#" class="order-link" data-order-id="{{ invoice.order_no.order_no }}">{{ invoice.order_no.order_no }}</a>
                   </td>
                   <td>{{ invoice.invoice_date }}</td>
-                  <td><button type="submit" class="btn btn-primary"
-                    onclick="redirectToEditShipping('{{ invoice.invoice_num }}')">
-                    <i class="fas fa-edit"></i>
-                  </button></td>
+                  <td style="white-space: nowrap;">
+                    <button type="submit" class="btn btn-primary"
+                      onclick="redirectToEditShipping('{{ invoice.invoice_num }}')">
+                      <i class="fas fa-edit"></i>
+                    </button>
+                    <form method="post" action="{% url 'delete_shipping_invoice' %}"
+                      style="display: inline-block; margin-left: 6px;"
+                      onsubmit="return confirm('Delete invoice {{ invoice.invoice_num }}? This will also remove its line items.');">
+                      {% csrf_token %}
+                      <input type="hidden" name="order_no" value="{{ my_order.order_no }}">
+                      <input type="hidden" name="invoice_num" value="{{ invoice.invoice_num }}">
+                      <button type="submit" class="btn btn-danger" title="Delete invoice">
+                        <i class="fas fa-trash"></i>
+                      </button>
+                    </form>
+                  </td>
                 </tr>
                 {% endfor %} {%else%}
                 <!-- <tr>

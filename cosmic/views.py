@@ -684,6 +684,28 @@ def display_single_order(request, order_no):
                     }
     return render(request, 'display_single_order.html', context)
 
+@login_required
+@user_passes_test(is_admin)
+def delete_shipping_invoice(request):
+    if request.method != 'POST':
+        return redirect('display_order')
+
+    order_no = request.POST.get('order_no')
+    invoice_num = request.POST.get('invoice_num')
+    if not order_no or not invoice_num:
+        messages.error(request, 'Order number and invoice number are required.')
+        return redirect('display_order')
+
+    try:
+        invoice = shipping_info.objects.get(invoice_num=invoice_num, order_no__order_no=order_no)
+    except shipping_info.DoesNotExist:
+        messages.error(request, f'Invoice "{invoice_num}" was not found for order "{order_no}".')
+        return redirect('display_single_order', order_no=order_no)
+
+    invoice.delete()
+    messages.success(request, f'Invoice "{invoice_num}" deleted successfully.')
+    return redirect('display_single_order', order_no=order_no)
+
 def display_single_purchase(request, purchase_no):
     purchase= cosmic_purchase.objects.get(purchase_no = purchase_no)
     if request.method == 'GET':
