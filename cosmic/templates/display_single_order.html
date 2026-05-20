@@ -195,15 +195,16 @@
       console.log(invoiceID, "inv");
       let url = "";
 
+      const encodedInvoice = encodeURIComponent(invoiceID);
       if (page === "bill_of_lading") {
-        url = `/cosmic/bill_of_lading?order_no=${orderID}&invoice_num=${invoiceID}`;
+        url = `/cosmic/bill_of_lading?order_no=${orderID}&invoice_num=${encodedInvoice}`;
       } // Add more conditions for other pages
       else if (page === "commercial_invoice") {
-        url = `/cosmic/commercial_invoice?order_no=${orderID}&invoice_num=${invoiceID}`;
+        url = `/cosmic/commercial_invoice?order_no=${orderID}&invoice_num=${encodedInvoice}`;
       } else if (page === "packing_list") {
-        url = `/cosmic/packing_list?order_no=${orderID}&invoice_num=${invoiceID}`;
+        url = `/cosmic/packing_list?order_no=${orderID}&invoice_num=${encodedInvoice}`;
       } else if (page === "truck_waybill") {
-        url = `/cosmic/truck_waybill?order_no=${orderID}&invoice_num=${invoiceID}`;
+        url = `/cosmic/truck_waybill?order_no=${orderID}&invoice_num=${encodedInvoice}`;
       } else if (page === "shipping_order") {
         url = `/cosmic/edit?order_no=${orderID}`;
       }
@@ -241,13 +242,13 @@
     //window.location.href = `/cosmic/print_order?order_no=${orderID}&invoice_num=${invoiceID}`;
   // }
   function redirectToEditShipping(orderID) {
-    window.location.href = `/cosmic/update_shipping?invoice_num=${orderID}`;
+    window.location.href = `/cosmic/update_shipping?invoice_num=${encodeURIComponent(orderID)}`;
 
     //window.location.href = `/cosmic/print_order?order_no=${orderID}&invoice_num=${invoiceID}`;
   }
 
   function redirectToShippingDetails(orderID) {
-    window.location.href = `/cosmic/edit_order?order_no=${orderID}`;
+    window.location.href = `/cosmic/create_shipping?order_no=${encodeURIComponent(orderID)}`;
 
     //window.location.href = `/cosmic/print_order?order_no=${orderID}&invoice_num=${invoiceID}`;
   }

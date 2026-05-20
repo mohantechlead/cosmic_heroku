@@ -1,9 +1,12 @@
 from django.shortcuts import render, redirect,get_object_or_404
+from django.urls import reverse
+from urllib.parse import urlencode
 from django.conf import settings
 from .forms import *
 from .models import *
 from django.contrib.auth.decorators import login_required,user_passes_test
 from django.forms import formset_factory,modelformset_factory
+from django.db import IntegrityError, transaction
 from django.db.models import Sum
 from django.db.utils import ProgrammingError, OperationalError
 from django.http import JsonResponse,HttpResponse
@@ -28,6 +31,77 @@ def _split_currency_amount(number):
     if not decimal_part:
         decimal_part = '0'
     return whole_part, decimal_part
+
+
+def _new_invoice_items_formset(prefix='items'):
+    """Empty line-item formset for adding a new invoice (not copied from the sales order)."""
+    invoice_formset = formset_factory(InvoiceItemForm, extra=1, min_num=1)
+    return invoice_formset(prefix=prefix)
+
+
+def _is_ajax(request):
+    return request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+
+
+def _flatten_validation_errors(ship_form=None, formset=None, message=None):
+    parts = []
+    if message:
+        parts.append(message)
+    if ship_form is not None:
+        for field, errs in ship_form.errors.items():
+            for err in errs:
+                parts.append(f'Invoice {field}: {err}')
+    if formset is not None:
+        if formset.non_form_errors():
+            for err in formset.non_form_errors():
+                parts.append(str(err))
+        for index, form in enumerate(formset):
+            for field, errs in form.errors.items():
+                for err in errs:
+                    parts.append(f'Item {index + 1} {field}: {err}')
+    return ' '.join(parts) if parts else 'Please correct the errors below.'
+
+
+def _shipping_save_error_response(request, order_no, ship_form=None, formset=None, message=None):
+    error_msg = _flatten_validation_errors(ship_form, formset, message)
+    messages.error(request, error_msg)
+    context = _shipping_details_context(
+        order_no,
+        ship_form=ship_form or ShippingForm(request.POST),
+        formset=formset,
+    )
+    if _is_ajax(request):
+        return JsonResponse(
+            {
+                'success': False,
+                'error': error_msg,
+                'errors': {
+                    'shipping': ship_form.errors if ship_form else {},
+                    'items': formset.errors if formset else {},
+                },
+            },
+            status=400,
+        )
+    return render(request, 'shipping_details.html', context)
+
+
+def _shipping_details_context(order_no, ship_form=None, formset=None):
+    cosmic_order_instance = get_object_or_404(cosmic_order, order_no=order_no)
+    order_lines = order_item.objects.filter(order_no=cosmic_order_instance)
+    if formset is None:
+        formset = _new_invoice_items_formset()
+    if ship_form is None:
+        ship_form = ShippingForm()
+    customers = customer_profile.objects.all()
+    return {
+        'form': EditOrderForm(instance=cosmic_order_instance),
+        'formset': formset,
+        'ship_form': ship_form,
+        'cosmic_order_instance': cosmic_order_instance,
+        'item_names': [line.item_name for line in order_lines],
+        'customers': customers,
+        'item': order_lines,
+    }
 
 @login_required
 def logout_user(request):
@@ -632,38 +706,92 @@ def display_single_purchase(request, purchase_no):
 
 def create_shipping(request):
     if request.method == 'POST':
-        ship_form = ShippingForm(request.POST)
-        number = request.POST.get('order_no') 
-        if ship_form.errors:
-            print(ship_form.errors) 
-        if ship_form.is_valid():
-            
-            order = cosmic_order.objects.get(order_no=number)
-            
-            # try:
-            
-            #     customer = customer_profile.objects.get(customer_name=notify_party_new)
-            #     ship_form.instance.notify_party3 = customer
-            # except customer_profile.DoesNotExist:
-            #     customer = None
-                
-            ship_form.instance.order_no = order
-            ship_form.instance.final_price = 0.00
-            #print(purchase.vendor_name,"name")
-            ship_form.save()
-            messages.success(request,'Shipping added successfully')
-            return render(request,'display_order.html')  # Redirect to the list of purchases or any other desired view
-        else:
-            print(ship_form.data,"nval")
-    
-        
-    form = ShippingForm()
-    formset = formset_factory(OrderItemForm, extra=1)
-    formset = formset(prefix="items")
+        order_no = request.POST.get('order_no')
+        if not order_no:
+            messages.error(request, 'Order number is required.')
+            if _is_ajax(request):
+                return JsonResponse(
+                    {'success': False, 'error': 'Order number is required.'},
+                    status=400,
+                )
+            return redirect('display_order')
 
-    # Render the form with the supplier choices
-    customers = customer_profile.objects.all()
-    return render(request, 'shipping_details.html', {'form': form, 'formset': formset, 'customers': customers})
+        ship_form = ShippingForm(request.POST)
+        invoice_formset = formset_factory(InvoiceItemForm, extra=0, min_num=1)
+        formset = invoice_formset(request.POST, prefix='items')
+
+        ship_valid = ship_form.is_valid()
+        formset_valid = formset.is_valid()
+        if not ship_valid or not formset_valid:
+            return _shipping_save_error_response(
+                request,
+                order_no,
+                ship_form=ship_form,
+                formset=formset,
+                message='Could not save shipping. Fix the errors below.',
+            )
+
+        item_forms = [form for form in formset if form.cleaned_data.get('item_name')]
+        if not item_forms:
+            return _shipping_save_error_response(
+                request,
+                order_no,
+                ship_form=ship_form,
+                formset=formset,
+                message='Add at least one invoice line item.',
+            )
+
+        order = get_object_or_404(cosmic_order, order_no=order_no)
+        try:
+            with transaction.atomic():
+                shipping = ship_form.save(commit=False)
+                shipping.order_no = order
+                shipping.final_price = 0.00
+                shipping.total_bags = 0
+                shipping.save()
+
+                final_price = 0.00
+                total_bags = 0
+                for form in item_forms:
+                    instance = form.save(commit=False)
+                    instance.invoice_num = shipping
+                    instance.save()
+                    final_price += float(form.cleaned_data.get('before_vat') or 0)
+                    bags_value = form.cleaned_data.get('bags')
+                    total_bags += int(bags_value) if bags_value not in (None, '') else 0
+
+                shipping.final_price = final_price
+                shipping.total_bags = total_bags
+                shipping.save(update_fields=['final_price', 'total_bags'])
+        except IntegrityError:
+            return _shipping_save_error_response(
+                request,
+                order_no,
+                ship_form=ship_form,
+                formset=formset,
+                message=(
+                    f'Invoice number "{request.POST.get("invoice_num")}" already exists. '
+                    'Nothing was saved.'
+                ),
+            )
+
+        success_msg = 'Shipping invoice and items saved successfully.'
+        messages.success(request, success_msg)
+        redirect_url = reverse('display_single_order', kwargs={'order_no': order_no})
+        if _is_ajax(request):
+            return JsonResponse(
+                {
+                    'success': True,
+                    'message': success_msg,
+                    'redirect_url': redirect_url,
+                }
+            )
+        return redirect('display_single_order', order_no=order_no)
+
+    order_no = request.GET.get('order_no')
+    if order_no:
+        return render(request, 'shipping_details.html', _shipping_details_context(order_no))
+    return redirect('display_order')
 
 @login_required 
 @user_passes_test(is_admin)
@@ -932,27 +1060,13 @@ def purchase_status(request):
     return render(request, 'admin/purchase_status.html', context)
 
 def edit_order(request):
-
     if request.method == 'GET':
         order_no = request.GET.get('order_no')
-        cosmic_order_instance = get_object_or_404(cosmic_order, order_no=order_no)
-        items = order_item.objects.all()
-        item = items.filter(order_no=cosmic_order_instance)
-        item_names = []
-        for name in item:
-            item_names.append(name.item_name)
-        print(item_names,"item")
-        form = EditOrderForm(instance=cosmic_order_instance)  # Initialize the form with the instance data
-      
+        if order_no:
+            query = urlencode({'order_no': order_no})
+            return redirect(f"{reverse('create_shipping')}?{query}")
+        return redirect('display_order')
 
-        ship_form = ShippingForm(prefix="ship")
-        customers = customer_profile.objects.all()
-        # last_shipping_info = shipping_info.objects.order_by('-invoice_num').first()
-        # print(last_shipping_info)
-        # last_number = int(last_shipping_info.invoice_num.split('/')[1]) if last_shipping_info else 0
-        # new_number = last_number + 1
-        # generated_invoice_num = f"CCFZE/{new_number:03d}/2024"
-        
     if request.method == 'POST':
         form = CosmicOrderForm(request.POST)
         
@@ -998,22 +1112,10 @@ def edit_order(request):
         # print(cosmic_order_instance.dict) 
         cosmic_order_instance.save()
         messages.success(request, 'Successfully Submitted')
-        return redirect('display_order') 
-     
-    formset = formset_factory(InvoiceItemForm, extra=1)
-    formset = formset(prefix="items")
+        return redirect('display_order')
 
-    context = {
-                'form': form, 
-               'formset':formset, 
-               'ship_form': ship_form,
-                'cosmic_order_instance': cosmic_order_instance, 
-                'item_names':item_names,
-                'customers': customers, 
-                'item':item
-                }
-    
-    return render(request, 'shipping_details.html', context)
+    return redirect('display_order')
+
 def edit_order_only(request):
 
     if request.method == 'GET':
@@ -1715,76 +1817,86 @@ def rejected_orders(request):
     return render(request, 'admin/rejected_orders.html', context)
 
 def create_invoice_items(request):
-    
     if request.method == 'POST':
-        formset = formset_factory(InvoiceItemForm, extra=1, min_num=1)
-        
-        formset = formset(request.POST or None,prefix="items")
-        #print(formset.data,"r")
-      
-        if formset.errors:
-            print(formset.errors)   
-        
-        # Check if 'PR_no' field is empty in each form within the formset
-        for form in formset:
-            print(form,"form")
-        non_empty_forms = [form for form in formset if form.cleaned_data.get('item_name')]
         pr_no = request.POST.get('order_no')
         invoice_no = request.POST.get('invoice_num')
-        bags = request.POST.get('bags')
-        pr = cosmic_order.objects.get(order_no = pr_no)
-        invoice = shipping_info.objects.get(invoice_num = invoice_no)
-        if non_empty_forms:
-            print("yes")
-            if formset.is_valid():
-                final_price = 0.00
-                total_bags = 0
-                for form in non_empty_forms:
-                    #form.instance.remaining = form.cleaned_data['quantity']
-                    form.instance.order_no = pr
-                    form.instance.invoice_num = invoice
-                    items = form.cleaned_data['item_name']
-                    item = item_codes.objects.all()
-                    item = item.filter(item_name = items).first()
-                    
-                    form.instance.hs_code = item.hs_code
-                    #final_quantity += form.cleaned_data['quantity']
-                    final_price += float(form.cleaned_data['before_vat'])
-                    total_bags += int(form.cleaned_data['bags'])
-                    print(total_bags)
-                    print(form.cleaned_data['before_vat'])
-                    form.save()
-                    # messages.success(request,"successful!")
-                    # return redirect('display_order')
-                
-                invoice.final_price = final_price
-                invoice.total_bags = total_bags
-                #pr.total_quantity = final_quantity
-                #pr.remaining = final_quantity
-                invoice.save()
-                pr.save()
-                
-            else:
-                print(formset.data,"nval")
-                # errors = dict(formset.errors.items())
-                # return JsonResponse({'form_errors': errors}, status=400)
-        
-            
-            context = {
-                'formset': formset,
-                # 'message':success_message,
-            }
-            return render(request, 'shipping_details.html', context)
-    else:
-       
-        formset = formset_factory(InvoiceItemForm, extra=1)
-        
-        formset = formset(prefix="items")
+        invoice_formset = formset_factory(InvoiceItemForm, extra=0, min_num=1)
+        formset = invoice_formset(request.POST, prefix='items')
 
-    context = {
-        'formset': formset,
-    }
-    return render(request, 'shipping_details.html', context)
+        if not pr_no or not invoice_no:
+            error_msg = 'Order number and invoice number are required.'
+            messages.error(request, error_msg)
+            if _is_ajax(request):
+                return JsonResponse({'error': error_msg}, status=400)
+            if pr_no:
+                return render(
+                    request,
+                    'shipping_details.html',
+                    _shipping_details_context(pr_no, formset=formset),
+                )
+            return redirect('display_order')
+
+        try:
+            pr = cosmic_order.objects.get(order_no=pr_no)
+            invoice = shipping_info.objects.get(invoice_num=invoice_no)
+        except (cosmic_order.DoesNotExist, shipping_info.DoesNotExist):
+            error_msg = (
+                'Shipping header was not found. Save the invoice header first, then add items.'
+            )
+            messages.error(request, error_msg)
+            if _is_ajax(request):
+                return JsonResponse({'error': error_msg}, status=400)
+            return render(
+                request,
+                'shipping_details.html',
+                _shipping_details_context(pr_no, formset=formset),
+            )
+
+        if not formset.is_valid():
+            messages.error(request, 'Please fix the item errors below.')
+            if _is_ajax(request):
+                return JsonResponse({'errors': formset.errors}, status=400)
+            return render(
+                request,
+                'shipping_details.html',
+                _shipping_details_context(pr_no, formset=formset),
+            )
+
+        final_price = 0.00
+        total_bags = 0
+        saved_any = False
+        for form in formset:
+            if not form.cleaned_data.get('item_name'):
+                continue
+            instance = form.save(commit=False)
+            instance.invoice_num = invoice
+            instance.save()
+            saved_any = True
+            final_price += float(form.cleaned_data.get('before_vat') or 0)
+            bags_value = form.cleaned_data.get('bags')
+            total_bags += int(bags_value) if bags_value not in (None, '') else 0
+
+        if not saved_any:
+            error_msg = 'Add at least one line item.'
+            messages.error(request, error_msg)
+            if _is_ajax(request):
+                return JsonResponse({'error': error_msg}, status=400)
+            return render(
+                request,
+                'shipping_details.html',
+                _shipping_details_context(pr_no, formset=formset),
+            )
+
+        invoice.final_price = final_price
+        invoice.total_bags = total_bags
+        invoice.save()
+        messages.success(request, 'Shipping details saved successfully.')
+        return redirect('display_single_order', order_no=pr_no)
+
+    order_no = request.GET.get('order_no')
+    if order_no:
+        return render(request, 'shipping_details.html', _shipping_details_context(order_no))
+    return redirect('display_order')
 
 def display_items(request):
     if request.method == 'POST':
@@ -1900,59 +2012,65 @@ def update_order(request):
 
 
 
+def _shipping_update_context(shipping_instance, formset=None):
+    if formset is None:
+        formset = _invoice_item_formset_for_shipping(shipping_instance)
+    invoice_date = shipping_instance.invoice_date
+    return {
+        'formset': formset,
+        'shipping_instance': shipping_instance,
+        'date': str(invoice_date) if invoice_date else '',
+    }
+
+
+def _invoice_item_formset_for_shipping(shipping_instance, post_data=None):
+    queryset = invoice_item.objects.filter(invoice_num=shipping_instance)
+    formset_factory = modelformset_factory(
+        invoice_item, form=InvoiceItemForm, extra=0, can_delete=True
+    )
+
+    if post_data is not None:
+        return formset_factory(post_data, queryset=queryset)
+
+    if queryset.exists():
+        return formset_factory(queryset=queryset)
+
+    empty_formset_factory = modelformset_factory(
+        invoice_item, form=InvoiceItemForm, extra=1, can_delete=True
+    )
+    return empty_formset_factory(queryset=invoice_item.objects.none())
+
+
 def edit_shipping(request):
-      
     if request.method == 'GET':
-        order_no = request.GET.get('invoice_num')
-       
-        try:
-            shipping_instance = shipping_info.objects.get(invoice_num = order_no)
-            items = purchase_item.objects.all()
-           
-            
-        except shipping_info.DoesNotExist:
-            
-            order = None 
-        
-        
-        form = EditShippingForm(instance=shipping_instance)  # Initialize the form with the instance data
-        
-    if request.method == 'POST':
-    
-        order_no = request.POST.get('invoice_num')
-        try:
-            shipping_instance = shipping_info.objects.get(invoice_num = order_no)
-            
-        except shipping_info.DoesNotExist:
-            
-            order = None 
-        shipping_instance = shipping_info.objects.get(invoice_num=order_no)
-        form = EditShippingForm(request.POST, instance=shipping_instance)
-        
-        if form.is_valid():
-            form.save()
+        invoice_num = request.GET.get('invoice_num')
+        if invoice_num:
+            query = urlencode({'invoice_num': invoice_num})
+            return redirect(f"{reverse('update_shipping')}?{query}")
+        return redirect('display_order')
 
-            return (render(request,"shipping_update.html"))
+    invoice_num = request.POST.get('invoice_num')
+    shipping_instance = get_object_or_404(shipping_info, invoice_num=invoice_num)
+    form = EditShippingForm(request.POST, instance=shipping_instance)
 
-        
-        return render(request, 'shipping_update.html')  # Redirect to a success page or another URL
-    
-    
-    return render(request, 'shipping_update.html', {'form': form,'shipping_instance': shipping_instance})
+    if form.is_valid():
+        form.save()
+        query = urlencode({'invoice_num': invoice_num})
+        return redirect(f"{reverse('update_shipping')}?{query}")
+
+    context = _shipping_update_context(
+        shipping_instance,
+        formset=_invoice_item_formset_for_shipping(shipping_instance),
+    )
+    return render(request, 'shipping_update.html', context)
 
 
 def update_shipping(request):
-     
     if request.method == "POST":
-        print(request.POST)
         invoice_no = request.POST.get('invoice_num')
         shipping_instance = get_object_or_404(shipping_info, invoice_num=invoice_no)
-        queryset = invoice_item.objects.filter(invoice_num=shipping_instance)
-        invoice_item_formset = modelformset_factory(invoice_item, form=InvoiceItemForm, extra=0, can_delete=True)  
-        print(shipping_instance.invoice_date,"date")
-        formset = invoice_item_formset(request.POST, queryset=queryset)
+        formset = _invoice_item_formset_for_shipping(shipping_instance, post_data=request.POST)
         if formset.is_valid():
-            print("valid")
             instances = formset.save(commit=False)
             for deleted in formset.deleted_objects:
                 deleted.delete()
@@ -1961,33 +2079,21 @@ def update_shipping(request):
                 instance.invoice_num = shipping_instance
                 instance.save()
 
-            aggregates = invoice_item.objects.filter(invoice_num=shipping_instance).aggregate(total_price=Sum('before_vat'), total_bags=Sum('bags'))
-            final_price = aggregates['total_price'] or 0
-            total_bags = aggregates['total_bags'] or 0
-            shipping_instance.final_price = final_price
-            shipping_instance.total_bags = total_bags
+            aggregates = invoice_item.objects.filter(invoice_num=shipping_instance).aggregate(
+                total_price=Sum('before_vat'),
+                total_bags=Sum('bags'),
+            )
+            shipping_instance.final_price = aggregates['total_price'] or 0
+            shipping_instance.total_bags = aggregates['total_bags'] or 0
             shipping_instance.save()
             return render(request, "create_order.html")
-    else:
-        invoice_no = request.GET.get('invoice_num')
-        shipping_instance = get_object_or_404(shipping_info, invoice_num=invoice_no)
-        shipping_instance.final_price = 0.0
-        date = shipping_instance.invoice_date
-        date = str(date)
-        invoice_item_formset = modelformset_factory(invoice_item, form=InvoiceItemForm, extra=0, can_delete=True)
-        queryset = invoice_item.objects.filter(invoice_num=shipping_instance)
-        formset = invoice_item_formset(queryset=queryset)
-        print(shipping_instance.invoice_date,"date")
-    
-    for form in formset.forms:
-        if form.errors:
-            print(form.errors)
-    print(date,"datess")
-    context = {
-        "formset": formset,
-        'shipping_instance': shipping_instance, 
-        "date":date
-    }
+
+        context = _shipping_update_context(shipping_instance, formset=formset)
+        return render(request, "shipping_update.html", context)
+
+    invoice_no = request.GET.get('invoice_num')
+    shipping_instance = get_object_or_404(shipping_info, invoice_num=invoice_no)
+    context = _shipping_update_context(shipping_instance)
     return render(request, "shipping_update.html", context)
 
 def get_item_data(request, item_id):

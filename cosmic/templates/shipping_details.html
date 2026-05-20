@@ -3,17 +3,24 @@
 
 
 {% block content %}
-<!-- {% if messages %}
+{% if messages %}
 <ul class="messages">
     {% for message in messages %}
     <li{% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</li>
-        {% endfor %}
+    {% endfor %}
 </ul>
-{% endif %} -->
+{% endif %}
 
 <div class="container" style="margin: 30px;">
     <div class="row">
         <div class="col-md-12">
+            <h1>Add New Shipping / Invoice</h1>
+            <p class="text-muted">
+                Order <strong>{{ cosmic_order_instance.order_no }}</strong> —
+                enter a <strong>new</strong> invoice number, then add invoice line items below
+                (these are separate from the sales order lines).
+                To change an existing invoice, use Edit on the order’s invoice list.
+            </p>
 
             {% if ship_form.errors %}
             <div class="alert alert-danger">
@@ -172,62 +179,53 @@
 </div>
 <div class="container">
     <div class="row">
-        <div class="col-md-7" style="font-size: small;">
-            <h3> Add Items</h3>
-            {% if pr_form.errors %}
+        <div class="col-md-12" style="font-size: small;">
+            <h3>Invoice line items</h3>
+            {% if formset.errors %}
             <div class="alert alert-danger">
                 <strong>Error(s) occurred:</strong>
                 <ul>
-                    {% for field, errors in pr_form.errors.items %}
-                    {% for error in errors %}
-                    <li>{{ field }}: {{ error }}</li>
+                    {% for form in formset %}
+                    {% for field, errors in form.errors.items %}
+                    <li>{{ field }}: {{ errors }}</li>
                     {% endfor %}
                     {% endfor %}
                 </ul>
             </div>
             {% endif %}
 
-
             <form method="post" action="{% url 'create_invoice_items' %}" id="form2">
                 {% csrf_token %}
-
                 {{ formset.management_form }}
                 {% for formset_error in formset.non_form_errors %}
-                <p>{{ formset_error }}</p>
+                <p class="text-danger">{{ formset_error }}</p>
                 {% endfor %}
-                <div id="form-lists">
+                <div id="item-formset-list">
                     {% for form in formset %}
-
-                    <div class="card-body row item-list form-group col-md-4">
-
-                        {{form.as_p}}
-
+                    <div class="card-body row item-list form-group col-md-5" style="margin: 10px;">
+                        <div style="margin-bottom: 8px;">
+                            <button type="button" class="btn btn-danger remove-item-btn">Remove Item</button>
+                        </div>
+                        {{ form }}
                     </div>
-
                     {% endfor %}
                 </div>
-
-                <div id="empty-form" class="hidden"> {{ formset.empty_form.as_p}}</div>
-                <button id="add-more" class="btn btn-primary" type="button"
-                    style="background-image:url('../static/back.png');color: aliceblue;">Add Item</button>
-
-
-
-
+                <div style="margin: 10px;">
+                    <button type="button" class="btn btn-primary" id="add-item-row"
+                        style="background-image:url('../static/back.png');color: aliceblue;">Add Item</button>
+                    <button type="button" class="btn btn-secondary" id="calculate-total-btn">Calculate Total Price</button>
+                    <span id="total-vat" name="total-vat"
+                        style="margin-left: 12px; font-weight: 700; color: #1b3f7a;">Total Price: 0.00</span>
+                </div>
             </form>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-sm-12">
-            <button id="submitss" class="col-sm-3 btn-lg"
-                style="background-image:url('../static/back.png');color: aliceblue; padding: 8px 16px;font-weight: bolder;">
-                Calculate Total
-            </button>
-            <span class=" col-sm-4">
-                <p id="total-vat" name="total-vat"
-                    style="height:50px; font-weight:bolder; font-size: 22px; color: black;"></p>
-            </span>
-
+            <template id="empty-item-form-template">
+                <div class="card-body row item-list form-group col-md-5" style="margin: 10px;">
+                    <div style="margin-bottom: 8px;">
+                        <button type="button" class="btn btn-danger remove-item-btn">Remove Item</button>
+                    </div>
+                    {{ formset.empty_form }}
+                </div>
+            </template>
         </div>
     </div>
     {% if messages %}
@@ -264,175 +262,182 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            const radioButtons = document.querySelectorAll('.measurement_type');
             const submitButton = document.querySelector('#submits');
-            const submitsButton = document.querySelector('#submitss');
-            const addMoreBtn = document.getElementById('add-more');
-            const priceFields = document.querySelectorAll('.price');
-            const totalPriceField = $('#total-price');
-            const totalVatField = $('#total-vat');
-            const orderNoValue = document.querySelector('input[name="order_no"]').value;
-            const radioButtons2 = document.querySelectorAll('.payment_type');
-            const totalNewForms = document.getElementById('id_items-TOTAL_FORMS');
-            const quantityFields = $('.quantity');
-
-            var univ_total = 0;
-            var univ_vat = 0;
-
-            submitsButton.addEventListener('click', function (event) {
-                event.preventDefault();
-                calculateTotalPrice();
-            });
-
-            addMoreBtn.addEventListener('click', add_new_form);
-
-            const VAT_RATE = 0.15;
-
-            function calculateTotalPrice() {
-                var total = 0;
-                var total_vat = 0;
-                var originalTotal = 0;
-                var originalVat = 0;
-
-                const formsets = $('.item-list');
-                const total_price_fields = document.querySelectorAll('.total_price');
-                const total_vat_fields = document.querySelectorAll('.before_vat');
-
-                $('.item-list').each(function () {
-                    const totalFields = $(this).find('.total_price');
-                    const vatFields = $(this).find('.before_vat');
-
-                    totalFields.each(function () {
-                        const price = parseFloat($(this).val()) || 0;
-                        total += price;
-                        originalTotal += price;
-                    });
-
-                    vatFields.each(function () {
-                        const vat_price = parseFloat($(this).val()) || 0;
-                        total_vat += vat_price;
-                        originalVat += vat_price;
-                    });
-
-                    // Update totals
-                    univ_total = total;
-                    univ_vat = total_vat;
-
-                    totalPriceField.val(total.toFixed(2));
-                    totalPriceField.text('Total Price: $' + total.toFixed(2));
-
-                    totalVatField.val(total_vat.toFixed(2));
-                    totalVatField.text('Total VAT: $' + total_vat.toFixed(2));
-                });
-            }
-
-            calculateTotalPrice(); // Call on page load
-
-            radioButtons.forEach(button => {
-                button.addEventListener('change', function () {
-                    // Hide all input elements
-                    document.querySelectorAll('.input-field').forEach(input => {
-                        input.style.display = 'none';
-                    });
-
-                    // Show the relevant input element
-                    const inputId = 'input_' + this.value;
-                    const inputElement = document.getElementById(inputId);
-                    if (inputElement) {
-                        inputElement.style.display = 'block';
-                    }
-                });
-            });
-
-            submitButton.addEventListener('click', function (event) {
-                event.preventDefault(); // Prevent default form submission
-
-                // Serialize form data
-                const form1 = document.getElementById('form1');
-                const form2 = document.getElementById('form2');
-                const formData1 = new FormData(form1);
-                const formData2 = new FormData(form2);
-
-                const prNoValue = orderNoValue;
-                const inv_no = formData1.get('invoice_num');
-
-                formData1.append('order_no', prNoValue);
-                formData2.append('order_no', prNoValue);
-                formData2.append('invoice_num', inv_no);
-
-                // Submit form1 and form2 asynchronously
-                fetch(form1.action, {
-                    method: 'POST',
-                    body: formData1
-                })
-                    .then(response => {
-                        if (!response.ok) {
-                            return response.json().then(data => {
-                                console.log('Form 1 errors:', data.form_errors);
-                            });
-                        } else {
-                            return fetch(form2.action, {
-                                method: 'POST',
-                                body: formData2
-                            });
-                        }
-                    })
-                    .then(response => {
-                        if (response && !response.ok) {
-                            return response.json().then(data => {
-                                console.log('Form 2 errors:', data.form_errors);
-                            });
-                        } else {
-                            // Reset forms and reload the page after successfully submitting both forms
-                            alert("Shipping Details Added!");
-                            form1.reset();
-                            form2.reset();
-                            window.location.reload();
-                        }
-                    });
-            });
+            const itemFormsetList = document.getElementById('item-formset-list');
+            const addItemButton = document.getElementById('add-item-row');
+            const calculateTotalButton = document.getElementById('calculate-total-btn');
+            const totalVatField = document.getElementById('total-vat');
+            const orderNoInput = document.querySelector('input[name="order_no"]');
+            const orderNoValue = orderNoInput ? orderNoInput.value : '';
+            const totalFormsInput = document.getElementById('id_items-TOTAL_FORMS');
 
             function updateTotalPrice(form) {
                 var quantity = parseFloat(form.find('.quantity').val()) || 0;
                 var price = parseFloat(form.find('.price').val()) || 0;
                 var total = quantity * price || 0;
-                var total_price = total + (total * VAT_RATE);
                 form.find('.before_vat').val(total.toFixed(2));
-                form.find('.total_price').val(total_price.toFixed(2));
+            }
+
+            function calculateAllRows() {
+                var grandTotal = 0;
+                $('#item-formset-list .item-list').each(function () {
+                    var row = $(this);
+                    updateTotalPrice(row);
+                    var rowTotal = parseFloat(row.find('.before_vat').val());
+                    if (!Number.isNaN(rowTotal)) {
+                        grandTotal += rowTotal;
+                    }
+                });
+                if (totalVatField) {
+                    totalVatField.textContent = 'Total Price: ' + grandTotal.toFixed(2);
+                }
+            }
+
+            function syncTotalFormsCount() {
+                if (totalFormsInput) {
+                    totalFormsInput.value = itemFormsetList.querySelectorAll('.item-list').length;
+                }
+            }
+
+            function bindRemoveButton(button) {
+                button.addEventListener('click', function () {
+                    const rows = itemFormsetList.querySelectorAll('.item-list');
+                    if (rows.length <= 1) {
+                        if (window.showToast) {
+                            window.showToast('At least one item row is required.', 'warning');
+                        }
+                        return;
+                    }
+                    button.closest('.item-list').remove();
+                    syncTotalFormsCount();
+                    calculateAllRows();
+                });
+            }
+
+            itemFormsetList.querySelectorAll('.remove-item-btn').forEach(bindRemoveButton);
+
+            if (addItemButton) {
+                addItemButton.addEventListener('click', function () {
+                    const template = document.getElementById('empty-item-form-template');
+                    const nextIndex = parseInt(totalFormsInput.value, 10);
+                    const html = template.innerHTML.replace(/__prefix__/g, nextIndex);
+                    const wrapper = document.createElement('div');
+                    wrapper.innerHTML = html.trim();
+                    const newRow = wrapper.firstElementChild;
+                    itemFormsetList.appendChild(newRow);
+                    totalFormsInput.value = nextIndex + 1;
+                    const removeBtn = newRow.querySelector('.remove-item-btn');
+                    if (removeBtn) {
+                        bindRemoveButton(removeBtn);
+                    }
+                    calculateAllRows();
+                });
+            }
+
+            if (calculateTotalButton) {
+                calculateTotalButton.addEventListener('click', calculateAllRows);
             }
 
             $(document).on('input', '.item-list .quantity, .item-list .price', function () {
+                updateTotalPrice($(this).closest('.item-list'));
+                calculateAllRows();
+            });
+
+            $(document).on('change', '.item-list .item_name', function () {
                 var form = $(this).closest('.item-list');
-                updateTotalPrice(form);
+                var itemId = $(this).val();
+                if (!itemId) {
+                    form.find('.hs_codes').val('');
+                    return;
+                }
+                fetch(`/cosmic/get_item_data/${encodeURIComponent(itemId)}/`)
+                    .then(response => response.ok ? response.json() : Promise.reject(response))
+                    .then(data => {
+                        form.find('.hs_codes').val(data.code || '');
+                    })
+                    .catch(() => {
+                        form.find('.hs_codes').val('');
+                    });
             });
 
-            $('.item-list').each(function () {
-                var form = $(this);
-                updateTotalPrice(form);
-            });
+            calculateAllRows();
 
-            function add_new_form(args) {
-                const currentForms = document.getElementsByClassName('item-list');
-                let currentFormsCount = currentForms.length;
+            submitButton.addEventListener('click', async function (event) {
+                event.preventDefault();
 
-                const copyFormTarget = document.getElementById('form-lists');
-                const copyEmptyForm = document.getElementById('empty-form').cloneNode(true);
-                copyEmptyForm.setAttribute('class', 'item-list form-group col-md-5 text-dark');
-                copyEmptyForm.setAttribute('id', `form-${currentFormsCount}`);
+                const form1 = document.getElementById('form1');
+                const form2 = document.getElementById('form2');
+                syncTotalFormsCount();
 
-                // Clear input values in the cloned form
-                const regex = new RegExp('__prefix__', 'g');
-                copyEmptyForm.querySelectorAll('input').forEach(function (input) {
-                    input.value = '';
+                const payload = new FormData();
+                new FormData(form1).forEach((value, key) => payload.append(key, value));
+                new FormData(form2).forEach((value, key) => {
+                    if (key !== 'csrfmiddlewaretoken') {
+                        payload.append(key, value);
+                    }
                 });
-                copyEmptyForm.innerHTML = copyEmptyForm.innerHTML.replace(regex, currentFormsCount);
+                payload.set('order_no', orderNoValue);
+                payload.set('invoice_num', payload.get('invoice_num') || '');
 
-                // Update totalNewForms value
-                totalNewForms.value = currentFormsCount + 1;
+                async function readErrorMessage(response, fallback) {
+                    try {
+                        const data = await response.json();
+                        if (data.error) {
+                            return data.error;
+                        }
+                        if (data.errors) {
+                            return typeof data.errors === 'string'
+                                ? data.errors
+                                : JSON.stringify(data.errors);
+                        }
+                    } catch (e) {
+                        // Response was not JSON.
+                    }
+                    return fallback;
+                }
 
-                // Append the cloned form to the form list
-                copyFormTarget.appendChild(copyEmptyForm);
-            }
+                submitButton.disabled = true;
+                try {
+                    const response = await fetch(form1.action, {
+                        method: 'POST',
+                        body: payload,
+                        headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                    });
+                    const data = await response.json().catch(() => ({}));
+
+                    if (!response.ok || !data.success) {
+                        const message = data.error || await readErrorMessage(
+                            response,
+                            'Could not save shipping. Nothing was saved.'
+                        );
+                        if (window.showToast) {
+                            window.showToast(message, 'error');
+                        }
+                        return;
+                    }
+
+                    if (window.showToast) {
+                        window.showToast(
+                            data.message || 'Shipping invoice saved successfully.',
+                            'success'
+                        );
+                    }
+                    setTimeout(function () {
+                        window.location.href = data.redirect_url ||
+                            `/cosmic/display_single_order/${encodeURIComponent(orderNoValue)}`;
+                    }, 700);
+                } catch (error) {
+                    console.error('Error submitting shipping:', error);
+                    if (window.showToast) {
+                        window.showToast(
+                            error.message || 'Error adding shipping details. Nothing was saved.',
+                            'error'
+                        );
+                    }
+                } finally {
+                    submitButton.disabled = false;
+                }
+            });
         });
     </script>
 

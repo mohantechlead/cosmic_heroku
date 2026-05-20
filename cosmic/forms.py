@@ -175,6 +175,12 @@ class PurchaseApprovalForm(forms.Form):
         widget=forms.TextInput,
         required=True 
     ) 
+def _item_code_for_stored_name(stored_name):
+    if not stored_name:
+        return None
+    return item_codes.objects.filter(item_name=stored_name).first()
+
+
 class InvoiceItemForm(forms.ModelForm):
    
     before_vat = forms.DecimalField(
@@ -202,6 +208,25 @@ class InvoiceItemForm(forms.ModelForm):
    
         model = invoice_item
         fields = ['item_name','hs_code','price','quantity','before_vat','measurement','bags','net_weight','gross_weight']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance and self.instance.pk and self.instance.item_name and not self.is_bound:
+            item = _item_code_for_stored_name(self.instance.item_name)
+            if item:
+                self.initial['item_name'] = item
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        selected_item = self.cleaned_data.get('item_name')
+        if selected_item:
+            instance.item_name = selected_item.item_name
+            if selected_item.hs_code:
+                instance.hs_code = selected_item.hs_code
+        if commit:
+            instance.save()
+            self.save_m2m()
+        return instance
 
 class restoreForm(forms.Form):
     selected_orders = forms.ModelMultipleChoiceField(
