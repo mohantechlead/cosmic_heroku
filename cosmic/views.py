@@ -20,6 +20,15 @@ from collections import defaultdict
 def is_admin(user):
     return user.is_staff
 
+def _split_currency_amount(number):
+    """Return whole and fractional parts as strings for amount-in-words formatting."""
+    if number is None:
+        number = 0
+    whole_part, _, decimal_part = str(number).partition('.')
+    if not decimal_part:
+        decimal_part = '0'
+    return whole_part, decimal_part
+
 @login_required
 def logout_user(request):
     django_logout(request)
@@ -1273,7 +1282,7 @@ def print_order(request):
         dicts = {1:"TEN",2:"TWENTY",3:"THIRTY",4:"FORTY",5:"FIFTY",6:"SIXTY",7:"SEVENTY",8:"EIGHTY",9:"NINTY"}
         
         print(number)
-        whole_part, decimal_part = str(number).split('.')
+        whole_part, decimal_part = _split_currency_amount(number)
         number_in_words = num2words(whole_part)
         number_in_words = number_in_words.replace(',', '')
         number_in_words = number_in_words.replace('-', ' ')
@@ -1355,7 +1364,7 @@ def print_purchase(request):
         dicts = {1:"TEN",2:"TWENTY",3:"THIRTY",4:"FORTY",5:"FIFTY",6:"SIXTY",7:"SEVENTY",8:"EIGHTY",9:"NINTY"}
         
         print(number)
-        whole_part, decimal_part = str(number).split('.')
+        whole_part, decimal_part = _split_currency_amount(number)
         number_in_words = num2words(whole_part)
         number_in_words = number_in_words.replace(',', '')
         number_in_words = number_in_words.replace('-', ' ')
@@ -1478,7 +1487,7 @@ def commercial_invoice(request):
         #         number += float(orders.freight_price)
         # print(number)
 
-        whole_part, decimal_part = str(number).split('.')
+        whole_part, decimal_part = _split_currency_amount(number)
         number_in_words = num2words(whole_part)
         number_in_words = number_in_words.replace(',', '')
         number_in_words = number_in_words.replace('-', ' ')
